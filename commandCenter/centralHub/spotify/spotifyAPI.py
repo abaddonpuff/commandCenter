@@ -22,7 +22,9 @@ SPOTIFY_SEARCH = '/v1/search'
 
 def spotify_authenticate():
     '''
-    Obtains the authentication bearer for a user.
+
+    Obtains the authentication bearer for a user. And returns the Bearer authorization header
+
     '''
     auth_url = SPOTIFY_BASE_AUTH_URL + SPOTIFY_AUTH
     headers = {
@@ -37,23 +39,22 @@ def spotify_authenticate():
 
     response = requests.post(auth_url, headers=headers, data=data)
     token_info = json.loads(response.text)
-    return token_info['access_token']
+    token = token_info['access_token']
+    headers = {"Authorization": f"Bearer {token}"}
+    return headers
 
 def get_spotify_artist(artist_name=None):
     '''
     Authenticate then search an artist based on an artist name. Searches for the name if id is not provided
     '''
 
-    if artist_name == None:
+    if artist_name is None:
         print('No artist id provided (Error handling)')
     else:
         if len(artist_name) != 22:
             artist_id = search_spotify_artist(artist_name)
 
-        bearer_code = spotify_authenticate()
-        headers = {
-        "Authorization":f'Bearer {bearer_code}'
-        }
+        headers = spotify_authenticate()
 
         url = SPOTIFY_BASE_URL + SPOTIFY_ARTISTS + artist_id
         response = requests.get(url, headers=headers)
@@ -63,13 +64,10 @@ def search_spotify_artist(artist_name=None):
 
     url = SPOTIFY_BASE_URL + SPOTIFY_SEARCH
 
-    if artist_name == None:
+    if artist_name is None:
         print('No artist name provided (Error handling)')
     else:
-        bearer_code = spotify_authenticate()
-        headers = {
-            "Authorization":f'Bearer {bearer_code}'
-        }
+        headers = spotify_authenticate()
 
         params = {
             "q": artist_name,
