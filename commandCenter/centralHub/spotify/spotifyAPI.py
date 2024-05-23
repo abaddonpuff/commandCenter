@@ -22,7 +22,9 @@ SPOTIFY_SEARCH = '/v1/search'
 
 def spotify_authenticate():
     '''
+
     Obtains the authentication bearer for a user. And returns the Bearer authorization header
+
     '''
     auth_url = SPOTIFY_BASE_AUTH_URL + SPOTIFY_AUTH
     headers = {
