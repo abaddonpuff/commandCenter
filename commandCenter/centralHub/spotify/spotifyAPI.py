@@ -43,43 +43,37 @@ def spotify_authenticate():
     headers = {"Authorization": f"Bearer {token}"}
     return headers
 
-def get_spotify_artist(artist_name=None):
+def get_spotify_artist(artist_name):
     '''
     Authenticate then search an artist based on an artist name. Searches for the name if id is not provided
     '''
 
-    if artist_name is None:
-        print('No artist id provided (Error handling)')
-    else:
-        if len(artist_name) != 22:
-            artist_id = search_spotify_artist(artist_name)
+    if len(artist_name) != 22:
+        artist_id = search_spotify_artist(artist_name)
 
-        headers = spotify_authenticate()
+    headers = spotify_authenticate()
 
-        url = SPOTIFY_BASE_URL + SPOTIFY_ARTISTS + artist_id
-        response = requests.get(url, headers=headers)
-        return response.text
+    url = SPOTIFY_BASE_URL + SPOTIFY_ARTISTS + artist_id
+    response = requests.get(url, headers=headers)
+    return response.text
 
-def search_spotify_artist(artist_name=None):
+def search_spotify_artist(artist_name):
 
     url = SPOTIFY_BASE_URL + SPOTIFY_SEARCH
 
-    if artist_name is None:
-        print('No artist name provided (Error handling)')
-    else:
-        headers = spotify_authenticate()
+    headers = spotify_authenticate()
 
-        params = {
-            "q": artist_name,
-            "type": "artist"
-        }
+    params = {
+        "q": artist_name,
+        "type": "artist"
+    }
 
-        response = requests.get(url, headers=headers, params=params)
-        artists_results = json.loads(response.text)
+    response = requests.get(url, headers=headers, params=params)
+    artists_results = json.loads(response.text)
 
-        for artist in artists_results['artists']['items']:
-            if artist['name'] == artist_name:
-                return artist['id']
+    for artist in artists_results['artists']['items']:
+        if artist['name'] == artist_name:
+            return artist['id']
 
 def main():
     print(get_spotify_artist("Taylor Swift"))

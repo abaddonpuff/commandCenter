@@ -3,7 +3,7 @@ import requests
 import json
 import config                      
 from requests_oauthlib import OAuth1Session                                                                                                                                                
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 from pathlib import Path
 
 load_dotenv()
@@ -16,7 +16,7 @@ LEAGUE_BASE = 'https://americas.api.riotgames.com'
 LEAGUE_BY_RIOTID = '/riot/account/v1/accounts/by-riot-id/'
 LEAGUE_GAMES_BY_SUMMONER = '/lol/match/v5/matches/by-puuid/'
 
-def get_league_summoner(summoner=None, tag_id=None):
+def get_league_summoner(summoner, tag_id):
     '''
     Gets the Summoner ID by name and tag
     '''
@@ -34,7 +34,7 @@ def get_league_summoner(summoner=None, tag_id=None):
 
     return results['puuid']
 
-def get_league_games_by_summoner_name(summoner=None, tag_id=None, start_time=0, endtime=0, count=20):
+def get_league_games_by_summoner_name(summoner, tag_id, start_time=0, endtime=0, count=20):
     '''
     Gets games played by a specific user by name and tag with optional start_time, endtime
     and amount of results.
