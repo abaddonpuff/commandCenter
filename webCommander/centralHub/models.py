@@ -26,4 +26,4 @@ class TwitterUserPosts(models.Model):
         unique_together = [('twitter_user','twitter_text')]
 
     def __str__(self):
-        return f'{self.TwitterUser.twitter_handle} Posts'
+        return f'{self.twitter_user.twitter_handle} Posts'
