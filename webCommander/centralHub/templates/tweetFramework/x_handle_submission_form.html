@@ -1,0 +1,15 @@
+<!-- my_template.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>X Handle Submit</title>
+</head>
+<body>
+    <h1>Submit Text</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form_handle.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
