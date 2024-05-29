@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}COMMAND CENTER{% endblock %}</title>
+</head>
+<body>
+    <div id="content">
+        {% block content%}
+        <a href="{% url 'showalltweets'%}">
+            X Dashboard
+        </a>
+        {% endblock %}
+    </div>
+</body>
+</html>

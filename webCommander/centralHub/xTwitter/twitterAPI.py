@@ -5,7 +5,7 @@ import config
 import pprint 
 from time import sleep   
 from requests_oauthlib import OAuth1Session                                                                                                                                                
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 from pathlib import Path
 
 load_dotenv()
@@ -16,7 +16,6 @@ X_API_KEY = os.getenv('X_API_KEY')
 X_API_SECRET = os.getenv('X_API_SECRET')
 X_ACCESS_TOKEN = os.getenv('X_ACCESS_TOKEN')
 X_ACCESS_TOKEN_SECRET = os.getenv('X_ACCESS_TOKEN_SECRET')
-#X_AUTHENTICATION_URL = 'https://api.twitter.com/2/oauth2/token'
 
 #DEFINE URLS
 X_BASE_URL = 'https://api.twitter.com'
@@ -52,7 +51,8 @@ def x_userlookup(x_user):
     params = {
         'user.fields': 'created_at',
         'expansions': 'pinned_tweet_id',
-        'tweet.fields': 'author_id,created_at'
+        'tweet.fields': 'author_id,created_at',
+        'user.fields':'profile_image_url'
     }
 
     api_url = X_GET_USER + x_user
@@ -96,7 +96,7 @@ def get_single_tweet(tweet_id):
     return tweets['data']
 
 def main():
-    print(get_latest_tweet_from_user("bbelderbos"))
+    print(x_userlookup("bbelderbos"))
 
 if __name__ == '__main__':
     main()

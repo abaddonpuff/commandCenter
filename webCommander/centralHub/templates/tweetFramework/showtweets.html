@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 
 {% block title %}Available Tweets{% endblock %}
-
 {% block content %}
     <h1>Available Tweets</h1>
+    <a href="{% url 'submit_handle'%}">
+    Submit a new user
+    </a>
+
     {% for tweet in alltweets %}
     <div class="tweet">
         <a href="{% url 'twitter_handle_summary' tweet.twitter_handle %}">
