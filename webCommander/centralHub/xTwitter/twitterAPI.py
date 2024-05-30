@@ -1,10 +1,10 @@
 import os
-import requests 
+import requests
 import json
 import config
-import pprint 
-from time import sleep   
-from requests_oauthlib import OAuth1Session                                                                                                                                                
+import pprint
+from time import sleep
+from requests_oauthlib import OAuth1Session
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -27,6 +27,11 @@ X_GET_TWEET = X_BASE_URL+'/2/users/'
 #CODES
 TOO_MANY_REQUESTS = 429
 
+
+class XUserDoesNotExist(Exception):
+    pass
+
+
 def x_authenticate():
 
     return OAuth1Session(
@@ -42,12 +47,11 @@ def request_to_x_api(endpoint, headers={}, params={}):
     while response.status_code == TOO_MANY_REQUESTS:
         print('Too many requests, trying in 15 mins...')
         sleep(900)
-        response = request_to_x_api(api_url, headers={}, params=params)
+        response = request_to_x_api(endpoint, headers={}, params=params)
 
     return response
 
 def x_userlookup(x_user):
-
     params = {
         'user.fields': 'created_at',
         'expansions': 'pinned_tweet_id',
@@ -58,11 +62,21 @@ def x_userlookup(x_user):
     api_url = X_GET_USER + x_user
 
     response = request_to_x_api(api_url, headers={}, params=params)
+
+    # TODO: what is the right code?
+    if response.status_code != 200:
+        raise XUserDoesNotExist(f"No valid response for handle {x_user}")
+
     return json.loads(response.text)
 
-def get_all_tweets_from_user(x_username, max_results=10):
-    x_user_id = x_userlookup(x_username)['data']['id']
 
+def get_all_tweets_from_user(x_username, max_results=10):
+    try:
+        x_user_id = x_userlookup(x_username)['data']['id']
+    except XUserDoesNotExist as e:
+        # TODO: better handle this
+        print(e)
+        return
     params = {
         'max_results':max_results
     }
@@ -74,10 +88,15 @@ def get_all_tweets_from_user(x_username, max_results=10):
     for tweet in tweets['data']:
         print(tweet['id'])
         print(tweet['text'])
-    return 
+    return
 
 def get_latest_tweet_from_user(x_username):
-    x_user_id = x_userlookup(x_username)['data']['id']
+    try:
+        x_user_id = x_userlookup(x_username)['data']['id']
+    except XUserDoesNotExist as e:
+        # TODO: better handle this
+        print(e)
+        return
 
     api_url = X_GET_TWEET + x_user_id + '/tweets'
 
