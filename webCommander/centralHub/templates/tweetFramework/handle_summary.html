@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 
 {% block title %}{{ handle.twitter_handle }}{% endblock %}
+
+<a href="{% url 'submit_handle'%}">
+    Submit a new user
+ </a>
 {% block content %}
     <h1>{{ handle.twitter_handle }}</h1>
 

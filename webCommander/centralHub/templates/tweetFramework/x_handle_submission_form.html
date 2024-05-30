@@ -1,0 +1,23 @@
+<!-- my_template.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>X Handle Submit</title>
+</head>
+<body>
+    <h1>Submit Text</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form_handle.as_p }}
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
+
