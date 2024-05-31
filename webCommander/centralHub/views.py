@@ -11,6 +11,7 @@ def submit_x_user(request):
             x_api_response = form_handle.cleaned_data['handle']
             entered_handle, created = TwitterUser.objects.get_or_create(
                 twitter_handle=x_api_response['data']['username'],
+                twitter_name=x_api_response['data']['name'],
                 twitter_user_id=x_api_response['data']['id'],
                 twitter_handle_avatar=x_api_response['data']['profile_image_url']
             )
