@@ -3,6 +3,7 @@ from django.db import models
 class TwitterUser(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     twitter_handle = models.CharField(max_length = 20, unique=True)
+    twitter_name = models.CharField(max_length = 100)
     twitter_user_id = models.PositiveIntegerField(unique=True)
     twitter_handle_avatar = models.URLField(blank=True)
 
