@@ -28,3 +28,16 @@ class TwitterUserPosts(models.Model):
 
     def __str__(self):
         return f'{self.twitter_user.twitter_handle} Posts'
+
+class SpotifyArtistInfo(models.Model):
+    date_added = models.DateTimeField(auto_now_add=True)
+    spotify_artist = models.CharField(max_length = 100, unique=True)
+    spotify_albums = models.CharField(max_length = 100)
+    spotify_tracks = models.PositiveIntegerField(blank=True)
+    spotify_image_url = models.URLField(blank=True)
+
+    class Meta:
+        ordering = ['-id']
+
+    def __str__(self):
+        return self.spotify_artist
