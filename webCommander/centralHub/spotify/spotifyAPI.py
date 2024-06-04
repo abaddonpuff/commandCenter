@@ -1,10 +1,13 @@
 import os
 import requests 
 import json
-import config                      
+import config
+import pprint                   
 from requests_oauthlib import OAuth1Session                                                                                                                                                
 from dotenv import load_dotenv, find_dotenv
 from pathlib import Path
+from collections import defaultdict
+
 
 load_dotenv()
 
@@ -50,13 +53,8 @@ def get_spotify_artist(artist_name):
     '''
     Authenticate then search an artist based on an artist name. Searches for the name if id is not provided
     '''
-
-    #TODO 
-    #Spotify artist is a 22 fixed character ID, but searching for a word would require to first call search_spotify_artist 
-    #to get the id which would also return some ids even if not an artist. Not sure how to handle this.
-
-    if len(artist_name) != SPOTIFY_FIXED_ARTIST_CHAR_LEN:
-        artist_id = search_spotify_artist(artist_name)
+    
+    artist_id = search_spotify_artist(artist_name)
 
     url = SPOTIFY_BASE_URL + SPOTIFY_ARTISTS + artist_id
 
@@ -75,23 +73,28 @@ def search_spotify_artist(artist_name):
     response = requests.get(url, headers=spotify_authenticate(), params=params)
     artists_results = json.loads(response.text)
 
+    #TODO Return a list of artists for a dropdown menu
     for artist in artists_results['artists']['items']:
-        if artist['name'] == artist_name:
-            return artist['id']
+        name = artist['name']
+        popularity = artist['popularity']
+        if len(artist['images']) > 0:
+            album_image = artist['images'][0]['url']
+        else:
+            album_image = "N/A"
+        print(name,album_image,popularity)
 
 def get_artist_albums(artist_name):
-    album_dict = {'images':[],
-        'name':[],
-        'total_tracks':[]}
+    album_dict = defaultdict(list)
 
-    if len(artist_name) != SPOTIFY_FIXED_ARTIST_CHAR_LEN:
-        artist_id = search_spotify_artist(artist_name)
+    artist_id = search_spotify_artist(artist_name)
 
     url = SPOTIFY_BASE_URL + SPOTIFY_ARTISTS + artist_id + '/albums'
 
     response = requests.get(url, headers=spotify_authenticate())
     albums_results = json.loads(response.text)
 
+    #TODO
+    #not sure if this is the best data type for this purpose
     for album in albums_results['items']:
         album_dict['images'].append(album['images'][0]['url'])
         album_dict['name'].append(album['name'])
@@ -100,7 +103,7 @@ def get_artist_albums(artist_name):
     return album_dict
 
 def main():
-    print(get_artist_albums("Taylor Swift"))
+    search_spotify_artist("Taylor Swift")
 
 if __name__ == '__main__':
     main()

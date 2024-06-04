@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load bootstrap5 %}
+{% block content %}
+    <h1>Available Artists</h1>
+    <a href="{% url 'submit_artist'%}">
+    Submit a new artist
+    </a>
+    <table class="table">
+    <thead>
+        <tr>
+          <th>Artist</th>
+          <th>Image</th>
+          <th>Popularity</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for artist in allartists %}
+    <tr>
+        <td><a href="{% url 'show_all_artists' artist.twitter_handle %}">
+        {{ artist.spotify_artist}}
+        </a></td>
+        <br>
+        <td>{{ tweet.twitter_name}}</td>
+        <td>{{ tweet.twitter_user_id}}</td>
+        <td><img src="{{ tweet.twitter_handle_avatar}}" alt="Avatar"></td>
+    </tr>
+    {% endfor %}
+</tbody>
+{% endblock %}

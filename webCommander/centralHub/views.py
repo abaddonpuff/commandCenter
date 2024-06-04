@@ -36,3 +36,8 @@ def handle_summary(request, twitter_handle):
 
 def home_page(request):
     return render(request, 'home.html')
+
+def list_artist(request):
+    allartists = SpotifyArtistInfo.objects.all()
+
+    return render(request, 'spotifyFramework/spotify_summary.html',{'allartists':allartists})

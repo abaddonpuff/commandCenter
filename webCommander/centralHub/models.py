@@ -32,12 +32,26 @@ class TwitterUserPosts(models.Model):
 class SpotifyArtistInfo(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     spotify_artist = models.CharField(max_length = 100, unique=True)
-    spotify_albums = models.CharField(max_length = 100)
-    spotify_tracks = models.PositiveIntegerField(blank=True)
-    spotify_image_url = models.URLField(blank=True)
+    spotify_image = models.URLField(blank=True)
+    spotify_popularity = models.PositiveIntegerField(blank=True)
 
     class Meta:
         ordering = ['-id']
 
     def __str__(self):
         return self.spotify_artist
+
+class SpotifyAlbumTracking(models.Model):
+    date_added = models.DateTimeField(auto_now_add=True)
+    spotify_user = models.ForeignKey(SpotifyArtistInfo,
+        related_name='artist_album',
+        on_delete=models.CASCADE)
+    spotify_albums = models.CharField(max_length = 100)
+    spotify_tracks = models.PositiveIntegerField(blank=True)
+    spotify_image_url = models.URLField(blank=True)
+
+    class Meta:
+        unique_together = [('spotify_user','spotify_albums')]
+
+    def __str__(self):
+        return f'{self.spotify_user.spotify_artist} Albums'
