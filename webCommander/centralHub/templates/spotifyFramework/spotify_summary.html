@@ -2,9 +2,14 @@
 {% load bootstrap5 %}
 {% block content %}
     <h1>Available Artists</h1>
-    <a href="{% url 'submit_artist'%}">
-    Submit a new artist
-    </a>
+
+    <input id="artist" name="artist" type="text" placeholder="Search for an artist" hx-get="/artists" hx-target="#artistChoices" hx-indicator=".htmx-indicator">
+
+    <br>
+    <select id="artistChoices" name="artistChoices"
+      hx-post="/submit-artist"><!-- todo -->
+    </select>
+
     <table class="table">
     <thead>
         <tr>
