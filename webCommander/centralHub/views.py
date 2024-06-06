@@ -1,7 +1,7 @@
 from django.shortcuts import render,get_object_or_404
 from django.contrib import messages
 from centralHub.forms import SubmitXUser
-from centralHub.models import TwitterUser, TwitterUserPosts
+from centralHub.models import TwitterUser, TwitterUserPosts, SpotifyArtistInfo
 
 
 def submit_x_user(request):
