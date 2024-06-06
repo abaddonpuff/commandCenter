@@ -1,8 +1,8 @@
 from django.shortcuts import render,get_object_or_404
 from django.contrib import messages
 from centralHub.forms import SubmitXUser
-from centralHub.models import TwitterUser, TwitterUserPosts
-
+from centralHub.models import TwitterUser, TwitterUserPosts, SpotifyArtistInfo
+from centralHub.spotify.spotifyAPI import get_spotify_artist
 
 def submit_x_user(request):
     if request.method == 'POST':
@@ -41,3 +41,14 @@ def list_artist(request):
     allartists = SpotifyArtistInfo.objects.all()
 
     return render(request, 'spotifyFramework/spotify_summary.html',{'allartists':allartists})
+
+
+def get_artists(request):
+    name = request.GET.get("name", "")
+    response = get_spotify_artist(name)
+    breakpoint()
+    # TODO: once api works, figure out how to return option values for select
+    # dropdown = htmx response
+    return "\n".join(
+        "<option value='{val}'>{val}</option>".format(val=row) for row in response
+    )

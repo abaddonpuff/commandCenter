@@ -1,9 +1,9 @@
 import os
-import requests 
+import requests
 import json
 import config
-import pprint                   
-from requests_oauthlib import OAuth1Session                                                                                                                                                
+import pprint
+from requests_oauthlib import OAuth1Session
 from dotenv import load_dotenv, find_dotenv
 from pathlib import Path
 from collections import defaultdict
@@ -53,7 +53,7 @@ def get_spotify_artist(artist_name):
     '''
     Authenticate then search an artist based on an artist name. Searches for the name if id is not provided
     '''
-    
+
     artist_id = search_spotify_artist(artist_name)
 
     url = SPOTIFY_BASE_URL + SPOTIFY_ARTISTS + artist_id
