@@ -22,8 +22,6 @@ SPOTIFY_AUTH = '/api/token'
 SPOTIFY_ARTISTS = '/v1/artists/'
 SPOTIFY_SEARCH = '/v1/search'
 
-SPOTIFY_FIXED_ARTIST_CHAR_LEN = 22
-
 class SpotifyArtistDoesNotExist(Exception):
     pass
 
@@ -62,6 +60,7 @@ def get_spotify_artist(artist_name):
     return response.text
 
 def search_spotify_artist(artist_name):
+    results = []
 
     url = SPOTIFY_BASE_URL + SPOTIFY_SEARCH
 
@@ -81,7 +80,9 @@ def search_spotify_artist(artist_name):
             album_image = artist['images'][0]['url']
         else:
             album_image = "N/A"
-        print(name,album_image,popularity)
+        results.append((name,album_image,popularity))
+
+    return results
 
 def get_artist_albums(artist_name):
     album_dict = defaultdict(list)
@@ -103,7 +104,7 @@ def get_artist_albums(artist_name):
     return album_dict
 
 def main():
-    search_spotify_artist("Taylor Swift")
+    print(search_spotify_artist("Taylor Swift"))
 
 if __name__ == '__main__':
     main()

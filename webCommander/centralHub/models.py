@@ -47,7 +47,7 @@ class SpotifyAlbumTracking(models.Model):
         related_name='artist_album',
         on_delete=models.CASCADE)
     spotify_albums = models.CharField(max_length = 100)
-    spotify_tracks = models.PositiveIntegerField(blank=True)
+    number_of_tracks = models.PositiveIntegerField(blank=True)
     spotify_image_url = models.URLField(blank=True)
 
     class Meta:
