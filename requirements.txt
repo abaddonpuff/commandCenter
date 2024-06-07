@@ -11,3 +11,4 @@ urllib3==2.2.1
 python-dotenv==1.0.1
 requests-oauthlib==2.0.0
 config==0.5.1
+django-bootstrap-v5==1.0.11

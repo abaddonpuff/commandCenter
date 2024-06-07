@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load bootstrap5 %}
+{% block content %}
+    <h1>Available Artists</h1>
+
+    <input id="artist" name="artist" type="text" placeholder="Search for an artist" hx-get="/artists" hx-trigger="submit_artist" hx-target="#artistChoices"  hx-indicator=".htmx-indicator">
+    <button type="button" onclick="document.querySelector('#artist').dispatchEvent(new Event('submit_artist'))">Submit</button>
+    <br>
+
+    <select id="artistChoices" name="artistChoices"
+      hx-post="/submit-artist">
+    </select>
+
+    <table class="table">
+    <thead>
+        <tr>
+          <th>Artist</th>
+          <th>Image</th>
+          <th>Popularity</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for artist in allartists %}
+    <tr>
+        <td><a href="{% url 'artist_summary' artist.spotify_artist %}">
+        {{ artist.spotify_artist}}
+        </a></td>
+        <br>
+        <td><img src="{{ artist.spotify_image}}" alt="Avatar"></td>
+        <td>{{ artist.spotify_popularity }}</td>
+    </tr>
+    {% endfor %}
+</tbody>
+{% endblock %}

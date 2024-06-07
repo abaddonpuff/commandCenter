@@ -26,6 +26,7 @@ X_GET_TWEET = X_BASE_URL+'/2/users/'
 
 #CODES
 TOO_MANY_REQUESTS = 429
+SUCCESS = 200
 
 
 class XUserDoesNotExist(Exception):
@@ -44,6 +45,8 @@ def x_authenticate():
 def request_to_x_api(endpoint, headers={}, params={}):
     x_session = x_authenticate()
     response = x_session.get(endpoint, headers=headers, params=params)
+
+    print(f'Request to API {response.status_code}')
     while response.status_code == TOO_MANY_REQUESTS:
         print('Too many requests, trying in 15 mins...')
         sleep(900)
@@ -62,12 +65,13 @@ def x_userlookup(x_user):
     api_url = X_GET_USER + x_user
 
     response = request_to_x_api(api_url, headers={}, params=params)
+    data_response = json.loads(response.text)
 
     # TODO: what is the right code?
-    if response.status_code != 200:
+    if 'errors' in data_response.keys():
         raise XUserDoesNotExist(f"No valid response for handle {x_user}")
 
-    return json.loads(response.text)
+    return data_response
 
 
 def get_all_tweets_from_user(x_username, max_results=10):
@@ -115,7 +119,7 @@ def get_single_tweet(tweet_id):
     return tweets['data']
 
 def main():
-    print(x_userlookup("bbelderbos"))
+    print(x_userlookup("ttDSwqr4423s23"))
 
 if __name__ == '__main__':
     main()
