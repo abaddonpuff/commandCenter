@@ -3,13 +3,18 @@
 {% block content %}
     <h1>Available Artists</h1>
 
-    <input id="artist" name="artist" type="text" placeholder="Search for an artist" hx-get="/artists" hx-trigger="submit_artist" hx-target="#artistChoices"  hx-indicator=".htmx-indicator">
-    <button type="button" onclick="document.querySelector('#artist').dispatchEvent(new Event('submit_artist'))">Submit</button>
-    <br>
+    <h2>Submit Artist</h2>
 
-    <select id="artistChoices" name="artistChoices"
-      hx-post="/submit-artist">
-    </select>
+    <form method="post" action="{% url 'show_all_artists' %}" hx-post="{% url 'show_all_artists' %}" hx-target="#artistChoicesContainer">
+        <br>
+        {% csrf_token %}
+        {{ spotify_search_form.as_p }}
+    </form>
+        <button type="submit">Search Artist</button>
+
+    <div id="artistChoicesContainer">
+        <!-- Dynamic artist choices will be loaded here -->
+    </div>
 
     <table class="table">
     <thead>
