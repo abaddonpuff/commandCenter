@@ -9,12 +9,12 @@
         <br>
         {% csrf_token %}
         {{ spotify_search_form.as_p }}
-    </form>
-        <button type="submit">Search Artist</button>
 
-    <div id="artistChoicesContainer">
-        <!-- Dynamic artist choices will be loaded here -->
-    </div>
+        <select id="artistChoicesContainer" name="artistChoicesContainer">
+          <!-- Dynamic artist choices will be loaded here -->
+        </select>
+        <button type="submit">Search Artist</button>
+    </form>
 
     <table class="table">
     <thead>

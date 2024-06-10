@@ -72,7 +72,9 @@ def search_spotify_artist(artist_name):
     response = requests.get(url, headers=spotify_authenticate(), params=params)
     artists_results = json.loads(response.text)
 
-    #TODO Return a list of artists for a dropdown menu
+    #TODO: if no artists are found, raise an exception
+    # or return empty list, now artists_results['artists']
+    # can raise a KeyError
     for artist in artists_results['artists']['items']:
         name = artist['name']
         popularity = artist['popularity']

@@ -63,13 +63,9 @@ def get_artists(request):
     return HttpResponse(options)
 
 def get_artist_choices(request):
-    print(request.GET.get('artist', ""))
-    name = request.GET.get("artist", "")
+    name = request.POST.get("artist", "")
     response = search_spotify_artist(name)
     options = ''.join(
         "<option value='{val}'>{val}, Popularity: {pop}</option>".format(val=row[0], pop=row[2]) for row in response
     )
-
-    print(response)
-    return render(request, 'spotifyFramework/spotify_artist_choices.html',{'response':response})
-
+    return HttpResponse(options)
