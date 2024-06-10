@@ -41,17 +41,17 @@ def home_page(request):
 def list_artist(request):
     allartists = SpotifyArtistInfo.objects.all()
 
-    print(f'################MY REQUEST METHOD IS {request.method}')
     if request.method == 'POST':
         spotify_search_form = SpotifySearchForm(request.POST)
         if spotify_search_form.is_valid():
+            print(f'Now Im here')
             artist_query = spotify_search_form.cleaned_data['artist']
             return render(request, 'spotifyFramework/spotify_summary.html', {'artist_query':artist_query})
     else:
-        print("####Im here")
         spotify_search_form = SpotifySearchForm()
 
-    return render(request, 'spotifyFramework/spotify_summary.html',{'allartists':allartists})
+    return render(request, 'spotifyFramework/spotify_summary.html',{'allartists':allartists,
+        'spotify_search_form':spotify_search_form})
 
 def get_artists(request):
     name = request.GET.get("artist", "")
@@ -62,20 +62,14 @@ def get_artists(request):
     )
     return HttpResponse(options)
 
-def get_artists_form(request):
-    print(f'################MY REQUEST METHOD IS {request.method}')
-    if request.method == 'POST':
-        spotify_search_form = SpotifySearchForm(request.POST)
-        if spotify_search_form.is_valid():
-            artist_query = spotify_search_form.cleaned_data['artist']
-            return render(request, 'spotifyFramework/spotify_summary.html', {'artist_query':artist_query})
-    else:
-        spotify_search_form = SpotifySearchForm()
+def get_artist_choices(request):
+    print(request.GET.get('artist', ""))
+    name = request.GET.get("artist", "")
+    response = search_spotify_artist(name)
+    options = ''.join(
+        "<option value='{val}'>{val}, Popularity: {pop}</option>".format(val=row[0], pop=row[2]) for row in response
+    )
 
-    return render(request, 'spotifyFramework/spotify_summary.html', {'spotify_search_form':spotify_search_form})
+    print(response)
+    return render(request, 'spotifyFramework/spotify_artist_choices.html',{'response':response})
 
-def submit_spotify_artist(request):
-    if request.method == 'POST':
-        form_handle = SubmitSpotifyArtist(request.POST)
-        
-    return render(request, 'spotifyFramework/spotify_summary.html',{'form_handle':form_handle})

@@ -5,7 +5,7 @@
 
     <h2>Submit Artist</h2>
 
-    <form method="post" action="{% url 'show_all_artists' %}" hx-post="{% url 'show_all_artists' %}" hx-target="#artistChoicesContainer">
+    <form method="post" action="{% url 'get_artist_choices' %}" hx-post="{% url 'get_artist_choices' %}" hx-target="#artistChoicesContainer">
         <br>
         {% csrf_token %}
         {{ spotify_search_form.as_p }}
