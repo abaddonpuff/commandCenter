@@ -40,36 +40,27 @@ def home_page(request):
 
 def list_artist(request):
     allartists = SpotifyArtistInfo.objects.all()
-
     if request.method == 'POST':
-        spotify_search_form = SpotifySearchForm(request.POST)
-        if spotify_search_form.is_valid():
-            print(f'Now Im here')
-            artist_query = spotify_search_form.cleaned_data['artist']
-            return render(request, 'spotifyFramework/spotify_summary.html', {'artist_query':artist_query})
-    else:
-        spotify_search_form = SpotifySearchForm()
+        artist = request.POST["artist"]
+        artist_choice = request.POST["artistChoicesContainer"]
 
-    return render(request, 'spotifyFramework/spotify_summary.html',{'allartists':allartists,
-        'spotify_search_form':spotify_search_form})
+        # call api for metadata
+
+        # db insert
+
+        # messages.success(request, 'Artist added successfully')
+
+    return render(request,
+                  'spotifyFramework/spotify_summary.html',
+                  {'allartists':allartists})
+
 
 def get_artists(request):
+    """Used to populate artistChoicesContainer"""
     name = request.GET.get("artist", "")
     response = search_spotify_artist(name)
-
     options = ''.join(
         "<option value='{val}'>{val}, Popularity: {pop}</option>".format(val=row[0], pop=row[2]) for row in response
     )
     return HttpResponse(options)
-
-def get_artist_choices(request):
-    print(request.GET.get('artist', ""))
-    name = request.GET.get("artist", "")
-    response = search_spotify_artist(name)
-    options = ''.join(
-        "<option value='{val}'>{val}, Popularity: {pop}</option>".format(val=row[0], pop=row[2]) for row in response
-    )
-
-    print(response)
-    return render(request, 'spotifyFramework/spotify_artist_choices.html',{'response':response})
 

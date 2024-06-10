@@ -5,16 +5,12 @@
 
     <h2>Submit Artist</h2>
 
-    <form method="post" action="{% url 'get_artist_choices' %}" hx-post="{% url 'get_artist_choices' %}" hx-target="#artistChoicesContainer">
-        <br>
+    <form method="post" action="{% url 'show_all_artists' %}">
         {% csrf_token %}
-        {{ spotify_search_form.as_p }}
-    </form>
+        <input name="artist" type="text" placeholder="Enter Artist Name" hx-get="{% url 'get_artists' %}" hx-trigger="keyup changed delay:500ms" hx-target="#artistChoicesContainer">
+        <select id="artistChoicesContainer" name="artistChoicesContainer"></select>
         <button type="submit">Search Artist</button>
-
-    <div id="artistChoicesContainer">
-        <!-- Dynamic artist choices will be loaded here -->
-    </div>
+    </form>
 
     <table class="table">
     <thead>
