@@ -3,7 +3,7 @@ from django.shortcuts import render,get_object_or_404
 from django.contrib import messages
 from centralHub.forms import SubmitXUser, SpotifySearchForm, SpotifyChoicesForm
 from centralHub.models import TwitterUser, TwitterUserPosts, SpotifyArtistInfo
-from centralHub.spotify.spotifyAPI import search_spotify_artist
+from centralHub.spotify.spotifyAPI import search_spotify_artist, search_spotify_artist_by_name
 
 def submit_x_user(request):
     if request.method == 'POST':
@@ -43,12 +43,17 @@ def list_artist(request):
     if request.method == 'POST':
         artist = request.POST["artist"]
         artist_choice = request.POST["artistChoicesContainer"]
-
-        # call api for metadata
-
-        # db insert
-
-        # messages.success(request, 'Artist added successfully')
+        artist_metadata = search_spotify_artist_by_name(artist_choice)
+        created_artist, created = SpotifyArtistInfo.objects.get_or_create(
+                spotify_artist=artist_metadata[0],
+                spotify_image=artist_metadata[1],
+                spotify_popularity=artist_metadata[2]
+            )
+        if not created:
+            messages.add_message(request, messages.INFO, "Error: Artist already in database.")
+        else:
+            return render(request, 'spotifyFramework/spotify_summary.html', {'created_artist':created_artist})
+        messages.success(request, 'Artist added successfully')
 
     return render(request,
                   'spotifyFramework/spotify_summary.html',

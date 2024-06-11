@@ -59,7 +59,31 @@ def get_spotify_artist(artist_name):
     response = requests.get(url, headers=spotify_authenticate())
     return response.text
 
+def search_spotify_artist_by_name(artist_name):
+    url = SPOTIFY_BASE_URL + SPOTIFY_SEARCH
+
+    params = {
+        "q": artist_name,
+        "type": "artist"
+    }
+
+    response = requests.get(url, headers=spotify_authenticate(), params=params)
+    artists_results = json.loads(response.text)
+
+    for artist in artists_results['artists']['items']:
+        if artist['name'] == artist_name:
+            name = artist['name']
+            popularity = artist['popularity']
+            if len(artist['images']) > 0:
+                album_image = artist['images'][0]['url']
+            else:
+                album_image = "N/A"
+    return (name,album_image,popularity)
+
 def search_spotify_artist(artist_name):
+    '''
+    Obtains all possible artists based on a name, user to select the right name to add.
+    '''
     results = []
 
     url = SPOTIFY_BASE_URL + SPOTIFY_SEARCH
@@ -72,7 +96,6 @@ def search_spotify_artist(artist_name):
     response = requests.get(url, headers=spotify_authenticate(), params=params)
     artists_results = json.loads(response.text)
 
-    #TODO Return a list of artists for a dropdown menu
     for artist in artists_results['artists']['items']:
         name = artist['name']
         popularity = artist['popularity']
@@ -94,8 +117,6 @@ def get_artist_albums(artist_name):
     response = requests.get(url, headers=spotify_authenticate())
     albums_results = json.loads(response.text)
 
-    #TODO
-    #not sure if this is the best data type for this purpose
     for album in albums_results['items']:
         album_dict['images'].append(album['images'][0]['url'])
         album_dict['name'].append(album['name'])
