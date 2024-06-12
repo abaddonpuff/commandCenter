@@ -1,5 +1,4 @@
 from django import forms
-
 from centralHub.xTwitter.twitterAPI import x_userlookup, XUserDoesNotExist
 
 
@@ -12,5 +11,10 @@ class SubmitXUser(forms.Form):
             x_api_response = x_userlookup(handle)
             return x_api_response
         except XUserDoesNotExist as e:
-            # this triggers form_handle.is_valid() in views.py to return False
             raise forms.ValidationError("Unrecognized X handle")
+
+class SpotifySearchForm(forms.Form):
+    artist = forms.CharField(label='Search for an artist', max_length=100)
+
+class SpotifyChoicesForm(forms.Form):
+    artist_choices = forms.ChoiceField(label='Select your option', choices=[])

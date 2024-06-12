@@ -3,13 +3,14 @@
 {% block content %}
     <h1>Available Artists</h1>
 
-    <input id="artist" name="artist" type="text" placeholder="Search for an artist" hx-get="/artists" hx-trigger="submit_artist" hx-target="#artistChoices"  hx-indicator=".htmx-indicator">
-    <button type="button" onclick="document.querySelector('#artist').dispatchEvent(new Event('submit_artist'))">Submit</button>
-    <br>
+    <h2>Submit Artist</h2>
 
-    <select id="artistChoices" name="artistChoices"
-      hx-post="/submit-artist">
-    </select>
+    <form method="post" action="{% url 'show_all_artists' %}">
+        {% csrf_token %}
+        <input name="artist" type="text" placeholder="Enter Artist Name" hx-get="{% url 'get_artists' %}" hx-trigger="keyup changed delay:500ms" hx-target="#artistChoicesContainer">
+        <select id="artistChoicesContainer" name="artistChoicesContainer"></select>
+        <button type="submit">Search Artist</button>
+    </form>
 
     <table class="table">
     <thead>
