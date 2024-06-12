@@ -55,7 +55,7 @@ def list_artist(request):
         else:
             messages.success(request, 'Artist added successfully')
             return render(request, 'spotifyFramework/spotify_summary.html', {'created_artist':created_artist})
-            
+
 
     return render(request,
                   'spotifyFramework/spotify_summary.html',
@@ -78,23 +78,11 @@ def artist_details(request, spotify_artist):
     '''
     Gets the tracks from an artist
     '''
-
-    all_albums = []
     artist = get_object_or_404(SpotifyArtistInfo, spotify_artist=spotify_artist)
-    
 
-    #Album = namedtuple('Album', ['album_name', 'number_of_tracks', 'spotify_album_img_url'])
+    # no need for namedtuples, albums are already objects so support attribute access
+    # the select_related() method is used to avoid the N+1 problem, see:
+    # https://www.youtube.com/watch?v=e_8JvcP1q48
+    albums = SpotifyAlbumTracking.objects.select_related("spotify_user").filter(spotify_user=artist)
 
-    albums = SpotifyAlbumTracking.objects.filter(spotify_user=artist)
-
-    #Wanted to use a list of namedtuples but cannot call from the render
-    # for element in albums:
-    #     A= Album(element.spotify_albums,element.number_of_tracks,element.spotify_image_url)
-    #     all_albums.append(A)
-
-    for element in albums:
-        A= (element.spotify_albums,element.number_of_tracks,element.spotify_image_url)
-        all_albums.append(A)
-
-
-    return render(request, 'spotifyFramework/spotify_artist_detail.html',{'all_albums':all_albums})
+    return render(request, 'spotifyFramework/spotify_artist_detail.html',{'albums': albums})
