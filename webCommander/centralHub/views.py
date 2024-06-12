@@ -2,8 +2,9 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render,get_object_or_404
 from django.contrib import messages
 from centralHub.forms import SubmitXUser, SpotifySearchForm, SpotifyChoicesForm
-from centralHub.models import TwitterUser, TwitterUserPosts, SpotifyArtistInfo
+from centralHub.models import TwitterUser, TwitterUserPosts, SpotifyArtistInfo, SpotifyAlbumTracking
 from centralHub.spotify.spotifyAPI import search_spotify_artist, search_spotify_artist_by_name
+from collections import namedtuple
 
 def submit_x_user(request):
     if request.method == 'POST':
@@ -52,8 +53,9 @@ def list_artist(request):
         if not created:
             messages.add_message(request, messages.INFO, "Error: Artist already in database.")
         else:
+            messages.success(request, 'Artist added successfully')
             return render(request, 'spotifyFramework/spotify_summary.html', {'created_artist':created_artist})
-        messages.success(request, 'Artist added successfully')
+            
 
     return render(request,
                   'spotifyFramework/spotify_summary.html',
@@ -61,7 +63,10 @@ def list_artist(request):
 
 
 def get_artists(request):
-    """Used to populate artistChoicesContainer"""
+    '''
+    Used to populate artistChoicesContainer
+
+    '''
     name = request.GET.get("artist", "")
     response = search_spotify_artist(name)
     options = ''.join(
@@ -69,3 +74,27 @@ def get_artists(request):
     )
     return HttpResponse(options)
 
+def artist_details(request, spotify_artist):
+    '''
+    Gets the tracks from an artist
+    '''
+
+    all_albums = []
+    artist = get_object_or_404(SpotifyArtistInfo, spotify_artist=spotify_artist)
+    
+
+    #Album = namedtuple('Album', ['album_name', 'number_of_tracks', 'spotify_album_img_url'])
+
+    albums = SpotifyAlbumTracking.objects.filter(spotify_user=artist)
+
+    #Wanted to use a list of namedtuples but cannot call from the render
+    # for element in albums:
+    #     A= Album(element.spotify_albums,element.number_of_tracks,element.spotify_image_url)
+    #     all_albums.append(A)
+
+    for element in albums:
+        A= (element.spotify_albums,element.number_of_tracks,element.spotify_image_url)
+        all_albums.append(A)
+
+
+    return render(request, 'spotifyFramework/spotify_artist_detail.html',{'all_albums':all_albums})

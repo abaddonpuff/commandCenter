@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load bootstrap5 %}
+
+{% block title %}{{ artist.spotify_artist }}{% endblock %}
+
+{% block content %}
+    <h1>{{ artist.spotify_artist }}</h1>
+
+    <thead>
+        <tr>
+          <th>Album Name</th>
+          <th># of Tracks</th>
+          <th>Album Cover</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for album in all_albums %}
+    <tr>
+        <td>{{ album[0] }}
+        </a></td>
+        <br>
+        <td>{{ album[1] }}</td>
+        <td>{{ album[2] }}</td>
+    </tr>
+    {% endfor %}
+{% endblock %}
