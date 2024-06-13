@@ -34,6 +34,7 @@ class SpotifyArtistInfo(models.Model):
     spotify_artist = models.CharField(max_length = 100, unique=True)
     spotify_image = models.URLField(blank=True)
     spotify_popularity = models.PositiveIntegerField(blank=True)
+    spotify_artist_albums_registered = models.PositiveIntegerField(blank=True, editable=True, default=0)
 
     class Meta:
         ordering = ['-id']

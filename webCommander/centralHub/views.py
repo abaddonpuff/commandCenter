@@ -3,7 +3,7 @@ from django.shortcuts import render,get_object_or_404
 from django.contrib import messages
 from centralHub.forms import SubmitXUser, SpotifySearchForm, SpotifyChoicesForm
 from centralHub.models import TwitterUser, TwitterUserPosts, SpotifyArtistInfo, SpotifyAlbumTracking
-from centralHub.spotify.spotifyAPI import search_spotify_artist, search_spotify_artist_by_name
+from centralHub.spotify.spotifyAPI import search_spotify_artist, search_spotify_artist_by_name, get_artist_albums
 from collections import namedtuple
 
 def submit_x_user(request):
@@ -80,9 +80,33 @@ def artist_details(request, spotify_artist):
     '''
     artist = get_object_or_404(SpotifyArtistInfo, spotify_artist=spotify_artist)
 
-    # no need for namedtuples, albums are already objects so support attribute access
-    # the select_related() method is used to avoid the N+1 problem, see:
-    # https://www.youtube.com/watch?v=e_8JvcP1q48
+    print(f'Amount of albums registered: {artist.spotify_artist_albums_registered}')
     albums = SpotifyAlbumTracking.objects.select_related("spotify_user").filter(spotify_user=artist)
+
+    #Is there any way to test what will actually happen on the database before doing so? :/
+    #New artist initial DB fill
+    if len(albums) == 0:
+        artist_albums = get_artist_albums(spotify_artist)
+        for item in range(0,len(artist_albums['name'])):
+            artist=spotify_artist
+            name=artist_albums['name'][item]
+            tracks=artist_albums['total_tracks'][item]
+            url=artist_albums['images'][item]
+            print(f'Artist:{artist}\nName:{name}\nTracks:{tracks}\nurl:{url}')
+            created_artist, created = SpotifyAlbumTracking.objects.get_or_create(
+                spotify_user=spotify_artist,
+                spotify_albums=artist_albums['name'][item],
+                number_of_tracks=artist_albums['total_tracks'][item],
+                spotify_image_url=artist_albums['images'][item]
+            )
+            if not created:
+                messages.add_message(request, messages.INFO, "Some error.")
+            else:
+                messages.success(request, 'Artist albums filled')
+    elif len(get_artist_albums(spotify_artist)['name'][0]) > len(albums):
+        print('MissingAlbums')
+        #TODO Analyze the DB for the missing albums (update)
+    else:
+        print('MissingAlbums')
 
     return render(request, 'spotifyFramework/spotify_artist_detail.html',{'albums': albums})

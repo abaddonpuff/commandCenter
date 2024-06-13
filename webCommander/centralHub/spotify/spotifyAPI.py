@@ -52,9 +52,10 @@ def get_spotify_artist(artist_name):
     Authenticate then search an artist based on an artist name. Searches for the name if id is not provided
     '''
 
-    artist_id = search_spotify_artist(artist_name)
+    artist_id = search_spotify_artist_by_name(artist_name)
+    print(artist_id)
 
-    url = SPOTIFY_BASE_URL + SPOTIFY_ARTISTS + artist_id
+    url = SPOTIFY_BASE_URL + SPOTIFY_ARTISTS + artist_id[3]
 
     response = requests.get(url, headers=spotify_authenticate())
     return response.text
@@ -74,11 +75,12 @@ def search_spotify_artist_by_name(artist_name):
         if artist['name'] == artist_name:
             name = artist['name']
             popularity = artist['popularity']
+            artist_id = artist['id']
             if len(artist['images']) > 0:
                 album_image = artist['images'][0]['url']
             else:
                 album_image = "N/A"
-    return (name,album_image,popularity)
+    return (name,album_image,popularity,artist_id)
 
 def search_spotify_artist(artist_name):
     '''
@@ -110,9 +112,9 @@ def search_spotify_artist(artist_name):
 def get_artist_albums(artist_name):
     album_dict = defaultdict(list)
 
-    artist_id = search_spotify_artist(artist_name)
+    artist_id = search_spotify_artist_by_name(artist_name)
 
-    url = SPOTIFY_BASE_URL + SPOTIFY_ARTISTS + artist_id + '/albums'
+    url = SPOTIFY_BASE_URL + SPOTIFY_ARTISTS + artist_id[3] + '/albums'
 
     response = requests.get(url, headers=spotify_authenticate())
     albums_results = json.loads(response.text)
@@ -125,7 +127,7 @@ def get_artist_albums(artist_name):
     return album_dict
 
 def main():
-    print(search_spotify_artist("Taylor Swift"))
+    pprint.pprint(get_artist_albums("Taylor Swift"))
 
 if __name__ == '__main__':
     main()
