@@ -86,7 +86,7 @@ def artist_details(request, spotify_artist):
     for artist_album in spotify_artist_albums:
         # assuming api response will be the same,
         # this will not re-insert the same album
-        created, album = SpotifyAlbumTracking.objects.get_or_create(
+        album, created = SpotifyAlbumTracking.objects.get_or_create(
             spotify_user=artist,
             spotify_albums=artist_album.name,
             number_of_tracks=artist_album.total_tracks,
