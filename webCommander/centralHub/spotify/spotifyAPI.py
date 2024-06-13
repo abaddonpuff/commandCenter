@@ -118,7 +118,7 @@ def search_spotify_artist(artist_name):
     return results
 
 
-def get_artist_albums(artist_name):
+def get_artist_albums(artist_name: str) -> list[Album]:
     artist_id = search_spotify_artist_by_name(artist_name)
 
     url = SPOTIFY_BASE_URL + SPOTIFY_ARTISTS + artist_id[3] + '/albums'
