@@ -55,4 +55,4 @@ class SpotifyAlbumTracking(models.Model):
         unique_together = [('spotify_user','spotify_albums')]
 
     def __str__(self):
-        return f'{self.spotify_user.spotify_artist} Albums'
+        return self.spotify_albums
