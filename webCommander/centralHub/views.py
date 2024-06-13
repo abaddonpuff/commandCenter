@@ -79,13 +79,13 @@ def artist_details(request, spotify_artist):
     Gets the tracks from an artist
     '''
     artist = get_object_or_404(SpotifyArtistInfo, spotify_artist=spotify_artist)
-    # todo: better distinguish variables: albums vs artist_albums
     albums = []
 
-    # assuming api response will be the same
-    artist_albums = get_artist_albums(spotify_artist)
+    spotify_artist_albums = get_artist_albums(spotify_artist)
     count = 0
-    for artist_album in artist_albums:
+    for artist_album in spotify_artist_albums:
+        # assuming api response will be the same,
+        # this will not re-insert the same album
         created, album = SpotifyAlbumTracking.objects.get_or_create(
             spotify_user=artist,
             spotify_albums=artist_album.name,
