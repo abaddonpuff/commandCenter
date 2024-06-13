@@ -105,9 +105,9 @@ def artist_details(request, spotify_artist):
         else:
             print(f"x) Album {album.spotify_albums} already in database")
 
-        if count > 0:
-            messages.success(request, f'{count} artist albums added successfully')
-        else:
-            messages.info(request, 'All albums already in database')
+    if count > 0:
+        messages.success(request, f'{count} artist albums added successfully')
+    else:
+        messages.info(request, 'All albums already in database')
 
     return render(request, 'spotifyFramework/spotify_artist_detail.html',{'albums': albums})
