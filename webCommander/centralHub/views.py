@@ -96,9 +96,9 @@ def artist_details(request, spotify_artist):
 
         if created:
             count += 1
-            print(f"v) Album {album.name} added")
+            print(f"v) Album {album.spotify_albums} added")
         else:
-            print(f"x) Album {album.name} already in database")
+            print(f"x) Album {album.spotify_albums} already in database")
 
         if count > 0:
             messages.success(request, f'{count} artist albums added successfully')

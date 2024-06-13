@@ -16,7 +16,7 @@ class TwitterUser(models.Model):
 class TwitterUserPosts(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     twitter_user = models.ForeignKey(TwitterUser,
-        related_name='user_posts', 
+        related_name='user_posts',
         on_delete=models.CASCADE)
     twitter_post_type = models.CharField(max_length = 20)
     twitter_post_id = models.PositiveIntegerField(unique=True)
@@ -47,7 +47,7 @@ class SpotifyAlbumTracking(models.Model):
     spotify_user = models.ForeignKey(SpotifyArtistInfo,
         related_name='artist_album',
         on_delete=models.CASCADE)
-    spotify_albums = models.CharField(max_length = 100)
+    spotify_albums = models.CharField(max_length=200)
     number_of_tracks = models.PositiveIntegerField(blank=True)
     spotify_image_url = models.URLField(blank=True)
 
