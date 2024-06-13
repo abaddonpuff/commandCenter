@@ -87,7 +87,7 @@ def artist_details(request, spotify_artist):
     count = 0
     for artist_album in artist_albums:
         created, album = SpotifyAlbumTracking.objects.get_or_create(
-            spotify_user=spotify_artist,
+            spotify_user=artist,
             spotify_albums=artist_album.name,
             number_of_tracks=artist_album.total_tracks,
             spotify_image_url=artist_album.image
