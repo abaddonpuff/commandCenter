@@ -79,34 +79,30 @@ def artist_details(request, spotify_artist):
     Gets the tracks from an artist
     '''
     artist = get_object_or_404(SpotifyArtistInfo, spotify_artist=spotify_artist)
+    # todo: better distinguish variables: albums vs artist_albums
+    albums = []
 
-    print(f'Amount of albums registered: {artist.spotify_artist_albums_registered}')
-    albums = SpotifyAlbumTracking.objects.select_related("spotify_user").filter(spotify_user=artist)
+    # assuming api response will be the same
+    artist_albums = get_artist_albums(spotify_artist)
+    count = 0
+    for artist_album in artist_albums:
+        created, album = SpotifyAlbumTracking.objects.get_or_create(
+            spotify_user=spotify_artist,
+            spotify_albums=artist_album.name,
+            number_of_tracks=artist_album.total_tracks,
+            spotify_image_url=artist_album.image
+        )
+        albums.append(album)
 
-    #Is there any way to test what will actually happen on the database before doing so? :/
-    #New artist initial DB fill
-    if len(albums) == 0:
-        artist_albums = get_artist_albums(spotify_artist)
-        for item in range(0,len(artist_albums['name'])):
-            artist=spotify_artist
-            name=artist_albums['name'][item]
-            tracks=artist_albums['total_tracks'][item]
-            url=artist_albums['images'][item]
-            print(f'Artist:{artist}\nName:{name}\nTracks:{tracks}\nurl:{url}')
-            created_artist, created = SpotifyAlbumTracking.objects.get_or_create(
-                spotify_user=spotify_artist,
-                spotify_albums=artist_albums['name'][item],
-                number_of_tracks=artist_albums['total_tracks'][item],
-                spotify_image_url=artist_albums['images'][item]
-            )
-            if not created:
-                messages.add_message(request, messages.INFO, "Some error.")
-            else:
-                messages.success(request, 'Artist albums filled')
-    elif len(get_artist_albums(spotify_artist)['name'][0]) > len(albums):
-        print('MissingAlbums')
-        #TODO Analyze the DB for the missing albums (update)
-    else:
-        print('MissingAlbums')
+        if created:
+            count += 1
+            print(f"v) Album {album.name} added")
+        else:
+            print(f"x) Album {album.name} already in database")
+
+        if count > 0:
+            messages.success(request, f'{count} artist albums added successfully')
+        else:
+            messages.info(request, 'All albums already in database')
 
     return render(request, 'spotifyFramework/spotify_artist_detail.html',{'albums': albums})
