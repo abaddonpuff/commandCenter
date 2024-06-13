@@ -1,6 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render,get_object_or_404
 from django.contrib import messages
+from django.db.utils import IntegrityError
 from centralHub.forms import SubmitXUser, SpotifySearchForm, SpotifyChoicesForm
 from centralHub.models import TwitterUser, TwitterUserPosts, SpotifyArtistInfo, SpotifyAlbumTracking
 from centralHub.spotify.spotifyAPI import search_spotify_artist, search_spotify_artist_by_name, get_artist_albums
@@ -86,13 +87,17 @@ def artist_details(request, spotify_artist):
     for artist_album in spotify_artist_albums:
         # assuming api response will be the same,
         # this will not re-insert the same album
-        album, created = SpotifyAlbumTracking.objects.get_or_create(
-            spotify_user=artist,
-            spotify_albums=artist_album.name,
-            number_of_tracks=artist_album.total_tracks,
-            spotify_image_url=artist_album.image
-        )
-        albums.append(album)
+        try:
+            album, created = SpotifyAlbumTracking.objects.get_or_create(
+                spotify_user=artist,
+                spotify_albums=artist_album.name,
+                number_of_tracks=artist_album.total_tracks,
+                spotify_image_url=artist_album.image
+            )
+            albums.append(album)
+        except IntegrityError:
+            print(f"x) Album {artist_album.name} already in db for arist, skipping")
+            continue
 
         if created:
             count += 1
