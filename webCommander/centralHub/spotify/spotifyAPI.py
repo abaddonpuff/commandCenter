@@ -1,4 +1,5 @@
 import os
+from typing import NamedTuple
 import requests
 import json
 import config
@@ -21,6 +22,13 @@ SPOTIFY_BASE_URL = 'https://api.spotify.com'
 SPOTIFY_AUTH = '/api/token'
 SPOTIFY_ARTISTS = '/v1/artists/'
 SPOTIFY_SEARCH = '/v1/search'
+
+
+class Album(NamedTuple):
+    name: str
+    image: str
+    total_tracks: int
+
 
 class SpotifyArtistDoesNotExist(Exception):
     pass
@@ -109,9 +117,8 @@ def search_spotify_artist(artist_name):
 
     return results
 
-def get_artist_albums(artist_name):
-    album_dict = defaultdict(list)
 
+def get_artist_albums(artist_name: str) -> list[Album]:
     artist_id = search_spotify_artist_by_name(artist_name)
 
     url = SPOTIFY_BASE_URL + SPOTIFY_ARTISTS + artist_id[3] + '/albums'
@@ -119,12 +126,16 @@ def get_artist_albums(artist_name):
     response = requests.get(url, headers=spotify_authenticate())
     albums_results = json.loads(response.text)
 
+    albums = []
     for album in albums_results['items']:
-        album_dict['images'].append(album['images'][0]['url'])
-        album_dict['name'].append(album['name'])
-        album_dict['total_tracks'].append(album['total_tracks'])
-
-    return album_dict
+        albums.append(
+            Album(
+                name=album['name'],
+                image=album['images'][0]['url'],
+                total_tracks=album['total_tracks']
+            )
+        )
+    return albums
 
 def main():
     pprint.pprint(get_artist_albums("Taylor Swift"))
