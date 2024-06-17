@@ -26,26 +26,36 @@ def submit_x_user(request):
         form_handle = SubmitXUser()
     return render(request, 'tweetFramework/x_handle_submission_form.html',{'form_handle':form_handle})
 
-
 def list_twitter(request):
     alltweets = TwitterUser.objects.all()
+
 
     return render(request, 'tweetFramework/showtweets.html',{'alltweets':alltweets})
 
 def handle_summary(request, twitter_handle):
-    handle = get_object_or_404(TwitterUser, twitter_handle=twitter_handle)
+    user = TwitterUser.objects.get(twitter_handle=twitter_handle)
 
-    return render(request, 'tweetFramework/handle_summary.html',{'handle':handle})
+    #TODO Get posts from database and render them
+    posts = user.user_posts.all()
+    breakpoint
+    #TODO If no posts get last 20 posts from user
+
+    #TODO If posts are populated, search for the latest tweet
+
+    #TODO IF latest Tweet is not the first item, then retrieve all items before latest id
+
+    return render(request, 'tweetFramework/handle_summary.html',{'posts':posts,
+                                                                 'user':user})
 
 def home_page(request):
     return render(request, 'home.html')
 
 def list_artist(request):
-    allartists = SpotifyArtistInfo.objects.all()
+    allartists = SpotifyArtistInfo.user_posts.all()
     if request.method == 'POST':
         artist = request.POST["artist"]
         artist_choice = request.POST["artistChoicesContainer"]
-        artist_metadata = search_spotify_artist_by_name(artist_choice)
+        artist_metadata = get_spotify_artist_by_id(artist_choice)
         created_artist, created = SpotifyArtistInfo.objects.get_or_create(
                 spotify_artist=artist_metadata[0],
                 spotify_image=artist_metadata[1],
@@ -71,7 +81,7 @@ def get_artists(request):
     name = request.GET.get("artist", "")
     response = search_spotify_artist(name)
     options = ''.join(
-        "<option value='{val}'>{val}, Popularity: {pop}</option>".format(val=row[0], pop=row[2]) for row in response
+        "<option value='{artist_id}'>{val}, Popularity: {pop}, artist_id: {artist_id}, </option>".format(val=row[0], pop=row[2], artist_id=row[3]) for row in response
     )
     return HttpResponse(options)
 

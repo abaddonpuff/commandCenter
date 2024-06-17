@@ -55,6 +55,16 @@ def spotify_authenticate():
     headers = {"Authorization": f"Bearer {token}"}
     return headers
 
+def get_spotify_artist_by_id(artist_id):
+    '''
+    Authenticate then search an artist based on an artist name. Searches for the name if id is not provided
+    '''
+
+    url = SPOTIFY_BASE_URL + SPOTIFY_ARTISTS + artist_id
+
+    response = requests.get(url, headers=spotify_authenticate())
+    return response.text
+
 def get_spotify_artist(artist_name):
     '''
     Authenticate then search an artist based on an artist name. Searches for the name if id is not provided
@@ -109,11 +119,12 @@ def search_spotify_artist(artist_name):
     for artist in artists_results['artists']['items']:
         name = artist['name']
         popularity = artist['popularity']
+        artist_id = artist['id']
         if len(artist['images']) > 0:
             album_image = artist['images'][0]['url']
         else:
             album_image = "N/A"
-        results.append((name,album_image,popularity))
+        results.append((name,album_image,popularity,artist_id))
 
     return results
 

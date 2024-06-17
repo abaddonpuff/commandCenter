@@ -1,11 +1,31 @@
 {% extends "base.html" %}
 
-{% block title %}{{ handle.twitter_handle }}{% endblock %}
+{% block title %}{{ user.twitter_handle }}{% endblock %}
 
 <a href="{% url 'submit_handle'%}">
     Submit a new user
  </a>
+
 {% block content %}
-    <h1>{{ handle.twitter_handle }}</h1>
+    <h1>{{ user.twitter_handle }} <img src="{{ user.twitter_handle_avatar}}" alt="Avatar"></h1>
+
+    <table class="table">
+      <thead>
+          <tr>
+            <th>Type</th>
+            <th>Content</th>
+            <th>Link to post</th>
+          </tr>
+      </thead>
+      <tbody>
+      {% for post in posts %}
+        <tr>
+            <td>{{ post.twitter_post_type }}</td>
+            <td>{{ post.twitter_text }}</td>
+            <td>{{ post.twitter_post_to_link }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+  </table>
 
 {% endblock %}
