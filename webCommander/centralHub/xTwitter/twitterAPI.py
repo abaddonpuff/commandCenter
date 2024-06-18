@@ -82,13 +82,19 @@ def get_all_tweets_from_user(x_username, max_results=10):
         print(e)
         return
     params = {
-        'max_results':max_results
+        'max_results':max_results,
+        'exclude':'replies,retweets',
+        'expansions':'attachments.media_keys,attachments.poll_ids',
+        #'since_id': <tweet id num> Option when database is available
+        'tweet.fields':'attachments'
+        #user.fields: most_recent_tweet_id
     }
     api_url = X_GET_TWEET + x_user_id + '/tweets'
 
     response = request_to_x_api(api_url, headers={}, params=params)
 
     tweets = json.loads(response.text)
+    print(tweets)
     for tweet in tweets['data']:
         print(tweet['id'])
         print(tweet['text'])
@@ -119,7 +125,7 @@ def get_single_tweet(tweet_id):
     return tweets['data']
 
 def main():
-    print(x_userlookup("ttDSwqr4423s23"))
+    print(get_all_tweets_from_user("bbelderbos", 5))
 
 if __name__ == '__main__':
     main()
