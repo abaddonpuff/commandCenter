@@ -59,7 +59,7 @@ def x_userlookup(x_user):
         'user.fields': 'created_at',
         'expansions': 'pinned_tweet_id',
         'tweet.fields': 'author_id,created_at',
-        'user.fields':'profile_image_url'
+        'user.fields':'profile_image_url,most_recent_tweet_id'
     }
 
     api_url = X_GET_USER + x_user
@@ -67,7 +67,6 @@ def x_userlookup(x_user):
     response = request_to_x_api(api_url, headers={}, params=params)
     data_response = json.loads(response.text)
 
-    # TODO: what is the right code?
     if 'errors' in data_response.keys():
         raise XUserDoesNotExist(f"No valid response for handle {x_user}")
 
@@ -94,11 +93,7 @@ def get_all_tweets_from_user(x_username, max_results=10):
     response = request_to_x_api(api_url, headers={}, params=params)
 
     tweets = json.loads(response.text)
-    print(tweets)
-    for tweet in tweets['data']:
-        print(tweet['id'])
-        print(tweet['text'])
-    return
+    return tweets
 
 def get_latest_tweet_from_user(x_username):
     try:

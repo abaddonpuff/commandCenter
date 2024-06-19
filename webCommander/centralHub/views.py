@@ -4,7 +4,8 @@ from django.contrib import messages
 from django.db.utils import IntegrityError
 from centralHub.forms import SubmitXUser, SpotifySearchForm, SpotifyChoicesForm
 from centralHub.models import TwitterUser, TwitterUserPosts, SpotifyArtistInfo, SpotifyAlbumTracking
-from centralHub.spotify.spotifyAPI import search_spotify_artist, search_spotify_artist_by_name, get_artist_albums
+from centralHub.spotify.spotifyAPI import search_spotify_artist, search_spotify_artist_by_name, get_artist_albums, get_spotify_artist_by_id
+from centralHub.xTwitter.twitterAPI import get_all_tweets_from_user
 from collections import namedtuple
 
 def submit_x_user(request):
@@ -12,11 +13,13 @@ def submit_x_user(request):
         form_handle = SubmitXUser(request.POST)
         if form_handle.is_valid():
             x_api_response = form_handle.cleaned_data['handle']
+            breakpoint()
             entered_handle, created = TwitterUser.objects.get_or_create(
                 twitter_handle=x_api_response['data']['username'],
                 twitter_name=x_api_response['data']['name'],
                 twitter_user_id=x_api_response['data']['id'],
-                twitter_handle_avatar=x_api_response['data']['profile_image_url']
+                twitter_handle_avatar=x_api_response['data']['profile_image_url'],
+                twitter_last_post_id=x_api_response['data']['most_recent_tweet_id']
             )
             if not created:
                 messages.add_message(request, messages.INFO, "Error: User already exists.")
@@ -35,12 +38,28 @@ def list_twitter(request):
 def handle_summary(request, twitter_handle):
     user = TwitterUser.objects.get(twitter_handle=twitter_handle)
 
-    #TODO Get posts from database and render them
     posts = user.user_posts.all()
-    breakpoint
+
     #TODO If no posts get last 20 posts from user
+    if len(posts) == 0:
+        last_tweets = get_all_tweets_from_user(user.twitter_handle, max_results=20)
+        for tweet in last_tweets['data']:
+            created_tweet, created = TwitterUserPosts.objects.get_or_create(
+                    twitter_user = user,
+                    #TODO create a function to obtain the post type if containing media
+                    twitter_post_type = 'text',
+                    twitter_post_id = tweet['id'],
+                    twitter_text = tweet['text'],
+                    twitter_post_to_link = f"https://x.com/{user.twitter_handle}/status/{tweet['id']}"
+                )
 
     #TODO If posts are populated, search for the latest tweet
+        if not created:
+            messages.add_message(request, messages.INFO, "No new posts available.")
+        else:
+            user.twitter_last_post_id = last_tweets['meta']['newest_id']
+            messages.success(request, 'Posts Updated')
+            return render(request, 'tweetFramework/handle_summary.html', {'created_tweet':created_tweet})
 
     #TODO IF latest Tweet is not the first item, then retrieve all items before latest id
 
@@ -51,15 +70,16 @@ def home_page(request):
     return render(request, 'home.html')
 
 def list_artist(request):
-    allartists = SpotifyArtistInfo.user_posts.all()
+    allartists = SpotifyArtistInfo.objects.all()
     if request.method == 'POST':
         artist = request.POST["artist"]
         artist_choice = request.POST["artistChoicesContainer"]
         artist_metadata = get_spotify_artist_by_id(artist_choice)
         created_artist, created = SpotifyArtistInfo.objects.get_or_create(
-                spotify_artist=artist_metadata[0],
-                spotify_image=artist_metadata[1],
-                spotify_popularity=artist_metadata[2]
+                spotify_artist=artist_metadata['name'],
+                spotify_image=artist_metadata['images'][0]['url'],
+                spotify_popularity=artist_metadata['popularity'],
+                spotify_artist_id=artist_metadata['id']
             )
         if not created:
             messages.add_message(request, messages.INFO, "Error: Artist already in database.")
@@ -81,7 +101,7 @@ def get_artists(request):
     name = request.GET.get("artist", "")
     response = search_spotify_artist(name)
     options = ''.join(
-        "<option value='{artist_id}'>{val}, Popularity: {pop}, artist_id: {artist_id}, </option>".format(val=row[0], pop=row[2], artist_id=row[3]) for row in response
+        "<option value='{artist_id}'>{val}, Popularity: {pop} </option>".format(val=row[0], pop=row[2], artist_id=row[3]) for row in response
     )
     return HttpResponse(options)
 
@@ -92,7 +112,7 @@ def artist_details(request, spotify_artist):
     artist = get_object_or_404(SpotifyArtistInfo, spotify_artist=spotify_artist)
     albums = []
 
-    spotify_artist_albums = get_artist_albums(spotify_artist)
+    spotify_artist_albums = get_artist_albums(artist.spotify_artist_id)
     count = 0
     for artist_album in spotify_artist_albums:
         # assuming api response will be the same,
