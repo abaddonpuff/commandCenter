@@ -5,6 +5,7 @@ from django.db.utils import IntegrityError
 from centralHub.forms import SubmitXUser, SpotifySearchForm, SpotifyChoicesForm
 from centralHub.models import TwitterUser, TwitterUserPosts, SpotifyArtistInfo, SpotifyAlbumTracking
 from centralHub.spotify.spotifyAPI import search_spotify_artist, search_spotify_artist_by_name, get_artist_albums
+from centralHub.xTwitter.twitterAPI import get_all_tweets_from_user
 from collections import namedtuple
 
 def submit_x_user(request):
@@ -35,12 +36,15 @@ def list_twitter(request):
 def handle_summary(request, twitter_handle):
     user = TwitterUser.objects.get(twitter_handle=twitter_handle)
 
-    #TODO Get posts from database and render them
     posts = user.user_posts.all()
-    breakpoint
     #TODO If no posts get last 20 posts from user
+    # if len(posts) == 0:
+    #Change to 0 after DB gets adjusted
+    if len(posts) == 2:    
+        user_posts = get_all_tweets_from_user(user.twitter_handle, max_results=5)
+        breakpoint()
 
-    #TODO If posts are populated, search for the latest tweet
+    #TODO If posts are populated, search for the latest twee
 
     #TODO IF latest Tweet is not the first item, then retrieve all items before latest id
 

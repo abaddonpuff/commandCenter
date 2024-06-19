@@ -94,11 +94,8 @@ def get_all_tweets_from_user(x_username, max_results=10):
     response = request_to_x_api(api_url, headers={}, params=params)
 
     tweets = json.loads(response.text)
-    print(tweets)
-    for tweet in tweets['data']:
-        print(tweet['id'])
-        print(tweet['text'])
-    return
+
+    return tweets
 
 def get_latest_tweet_from_user(x_username):
     try:
