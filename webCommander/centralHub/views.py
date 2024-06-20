@@ -5,15 +5,16 @@ from django.db.utils import IntegrityError
 from centralHub.forms import SubmitXUser, SpotifySearchForm, SpotifyChoicesForm
 from centralHub.models import TwitterUser, TwitterUserPosts, SpotifyArtistInfo, SpotifyAlbumTracking
 from centralHub.spotify.spotifyAPI import search_spotify_artist, search_spotify_artist_by_name, get_artist_albums, get_spotify_artist_by_id
-from centralHub.xTwitter.twitterAPI import get_all_tweets_from_user
+from centralHub.xTwitter.twitterAPI import get_top_tweets_from_user, get_tweets_since_last
 from collections import namedtuple
+
+FIRST_LOAD=20
 
 def submit_x_user(request):
     if request.method == 'POST':
         form_handle = SubmitXUser(request.POST)
         if form_handle.is_valid():
             x_api_response = form_handle.cleaned_data['handle']
-            breakpoint()
             entered_handle, created = TwitterUser.objects.get_or_create(
                 twitter_handle=x_api_response['data']['username'],
                 twitter_name=x_api_response['data']['name'],
@@ -35,31 +36,56 @@ def list_twitter(request):
 
     return render(request, 'tweetFramework/showtweets.html',{'alltweets':alltweets})
 
-def handle_summary(request, twitter_handle):
-    user = TwitterUser.objects.get(twitter_handle=twitter_handle)
-
-    posts = user.user_posts.all()
-
-    #TODO If no posts get last 20 posts from user
-    if len(posts) == 0:
-        last_tweets = get_all_tweets_from_user(user.twitter_handle, max_results=20)
-        for tweet in last_tweets['data']:
-            created_tweet, created = TwitterUserPosts.objects.get_or_create(
-                    twitter_user = user,
+def insert_to_x_db(twitter_user, tweet_data):
+    created_count=0
+    for tweet in tweet_data['data']:
+        created_tweet, created = TwitterUserPosts.objects.get_or_create(
+                    twitter_user = twitter_user,
                     #TODO create a function to obtain the post type if containing media
                     twitter_post_type = 'text',
                     twitter_post_id = tweet['id'],
                     twitter_text = tweet['text'],
                     twitter_post_to_link = f"https://x.com/{user.twitter_handle}/status/{tweet['id']}"
                 )
+        if created:
+            created_count += 1
+            twitter_user.twitter_last_post_id = last_tweets['meta']['newest_id']
+        return created_count
+
+def handle_summary(request, twitter_handle):
+    user = TwitterUser.objects.get(twitter_handle=twitter_handle)
+
+    posts = user.user_posts.all()
+
+    last_count = posts.count()
+    if posts.count() == 0:
+        last_tweets = get_top_tweets_from_user(user.twitter_handle, max_results=FIRST_LOAD)
+        created_count = insert_to_x_db(user, last_tweets)
+        # for tweet in last_tweets['data']:
+        #     created_tweet, created = TwitterUserPosts.objects.get_or_create(
+        #             twitter_user = user,
+        #             #TODO create a function to obtain the post type if containing media
+        #             twitter_post_type = 'text',
+        #             twitter_post_id = tweet['id'],
+        #             twitter_text = tweet['text'],
+        #             twitter_post_to_link = f"https://x.com/{user.twitter_handle}/status/{tweet['id']}"
+        #         )
 
     #TODO If posts are populated, search for the latest tweet
-        if not created:
-            messages.add_message(request, messages.INFO, "No new posts available.")
-        else:
-            user.twitter_last_post_id = last_tweets['meta']['newest_id']
-            messages.success(request, 'Posts Updated')
-            return render(request, 'tweetFramework/handle_summary.html', {'created_tweet':created_tweet})
+        if created_count > 0:
+            messages.success(request, f'{created_count} Posts created')
+            return render(request, 'tweetFramework/handle_summary.html', {'posts':posts,
+                                                                            'user':user})
+    else:
+        if 'data' in get_tweets_since_last(user.twitter_user_id,user.twitter_last_post_id).keys():
+            new_posts = get_tweets_since_last(user.twitter_user_id,user.twitter_last_post_id)
+            #New items introduced
+            created_count= insert_to_x_db(user, new_posts)
+            
+            if created_count > 0:
+                messages.success(request, f'{created_count} Posts created')
+                return render(request, 'tweetFramework/handle_summary.html', {'posts':posts,
+                                                                         '      user':user})
 
     #TODO IF latest Tweet is not the first item, then retrieve all items before latest id
 

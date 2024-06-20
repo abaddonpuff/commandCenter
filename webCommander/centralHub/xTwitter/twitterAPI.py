@@ -73,7 +73,7 @@ def x_userlookup(x_user):
     return data_response
 
 
-def get_all_tweets_from_user(x_username, max_results=10):
+def get_top_tweets_from_user(x_username, max_results=10):
     try:
         x_user_id = x_userlookup(x_username)['data']['id']
     except XUserDoesNotExist as e:
@@ -89,6 +89,23 @@ def get_all_tweets_from_user(x_username, max_results=10):
         #user.fields: most_recent_tweet_id
     }
     api_url = X_GET_TWEET + x_user_id + '/tweets'
+
+    response = request_to_x_api(api_url, headers={}, params=params)
+
+    tweets = json.loads(response.text)
+    return tweets
+
+def get_tweets_since_last(x_user_id: int,last_id: int, max_results=30) -> list:
+
+    params = {
+        'max_results':max_results,
+        'exclude':'replies,retweets',
+        'expansions':'attachments.media_keys,attachments.poll_ids',
+        'since_id': last_id,
+        'tweet.fields':'attachments'
+        #user.fields: most_recent_tweet_id
+    }
+    api_url = X_GET_TWEET + str(x_user_id) + '/tweets'
 
     response = request_to_x_api(api_url, headers={}, params=params)
 
@@ -120,7 +137,8 @@ def get_single_tweet(tweet_id):
     return tweets['data']
 
 def main():
-    print(get_all_tweets_from_user("bbelderbos", 5))
+    #Testing Abaddon
+    print(get_tweets_since_last(284461865,1803205013553996218))
 
 if __name__ == '__main__':
     main()
