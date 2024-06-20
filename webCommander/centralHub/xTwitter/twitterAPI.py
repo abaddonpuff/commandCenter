@@ -74,6 +74,7 @@ def x_userlookup(x_user):
 
 
 def get_top_tweets_from_user(x_username, max_results=10):
+    # working from username, need to lookup id first
     try:
         x_user_id = x_userlookup(x_username)['data']['id']
     except XUserDoesNotExist as e:
@@ -96,7 +97,6 @@ def get_top_tweets_from_user(x_username, max_results=10):
     return tweets
 
 def get_tweets_since_last(x_user_id: int,last_id: int, max_results=30) -> list:
-
     params = {
         'max_results':max_results,
         'exclude':'replies,retweets',

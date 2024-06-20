@@ -6,7 +6,7 @@ class TwitterUser(models.Model):
     twitter_name = models.CharField(max_length = 100)
     twitter_user_id = models.PositiveIntegerField(unique=True)
     twitter_handle_avatar = models.URLField(blank=True)
-    twitter_last_post_id = models.PositiveIntegerField(unique=True,blank=True,)
+    twitter_last_post_id = models.PositiveIntegerField(unique=True, null=True, blank=True)
 
     class Meta:
         ordering = ['-id']

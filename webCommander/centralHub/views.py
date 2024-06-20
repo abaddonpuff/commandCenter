@@ -1,12 +1,11 @@
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.shortcuts import render,get_object_or_404
 from django.contrib import messages
 from django.db.utils import IntegrityError
-from centralHub.forms import SubmitXUser, SpotifySearchForm, SpotifyChoicesForm
+from centralHub.forms import SubmitXUser
 from centralHub.models import TwitterUser, TwitterUserPosts, SpotifyArtistInfo, SpotifyAlbumTracking
-from centralHub.spotify.spotifyAPI import search_spotify_artist, search_spotify_artist_by_name, get_artist_albums, get_spotify_artist_by_id
+from centralHub.spotify.spotifyAPI import search_spotify_artist, get_artist_albums, get_spotify_artist_by_id
 from centralHub.xTwitter.twitterAPI import get_top_tweets_from_user, get_tweets_since_last
-from collections import namedtuple
 
 FIRST_LOAD=20
 
@@ -45,52 +44,35 @@ def insert_to_x_db(twitter_user, tweet_data):
                     twitter_post_type = 'text',
                     twitter_post_id = tweet['id'],
                     twitter_text = tweet['text'],
-                    twitter_post_to_link = f"https://x.com/{user.twitter_handle}/status/{tweet['id']}"
+                    twitter_post_to_link = f"https://x.com/{twitter_user.twitter_handle}/status/{tweet['id']}"
                 )
         if created:
             created_count += 1
-            twitter_user.twitter_last_post_id = last_tweets['meta']['newest_id']
+            twitter_user.twitter_last_post_id = tweet_data['meta']['newest_id']
         return created_count
 
 def handle_summary(request, twitter_handle):
     user = TwitterUser.objects.get(twitter_handle=twitter_handle)
 
     posts = user.user_posts.all()
+    created_count = 0
 
-    last_count = posts.count()
     if posts.count() == 0:
         last_tweets = get_top_tweets_from_user(user.twitter_handle, max_results=FIRST_LOAD)
         created_count = insert_to_x_db(user, last_tweets)
-        # for tweet in last_tweets['data']:
-        #     created_tweet, created = TwitterUserPosts.objects.get_or_create(
-        #             twitter_user = user,
-        #             #TODO create a function to obtain the post type if containing media
-        #             twitter_post_type = 'text',
-        #             twitter_post_id = tweet['id'],
-        #             twitter_text = tweet['text'],
-        #             twitter_post_to_link = f"https://x.com/{user.twitter_handle}/status/{tweet['id']}"
-        #         )
-
-    #TODO If posts are populated, search for the latest tweet
-        if created_count > 0:
-            messages.success(request, f'{created_count} Posts created')
-            return render(request, 'tweetFramework/handle_summary.html', {'posts':posts,
-                                                                            'user':user})
+        #TODO If posts are populated, search for the latest tweet
     else:
-        if 'data' in get_tweets_since_last(user.twitter_user_id,user.twitter_last_post_id).keys():
-            new_posts = get_tweets_since_last(user.twitter_user_id,user.twitter_last_post_id)
+        new_posts = get_tweets_since_last(user.twitter_user_id,user.twitter_last_post_id)
+        if 'data' in new_posts.keys():
             #New items introduced
             created_count= insert_to_x_db(user, new_posts)
-            
-            if created_count > 0:
-                messages.success(request, f'{created_count} Posts created')
-                return render(request, 'tweetFramework/handle_summary.html', {'posts':posts,
-                                                                         '      user':user})
+
+    if created_count > 0:
+        messages.success(request, f'{created_count} Posts created')
 
     #TODO IF latest Tweet is not the first item, then retrieve all items before latest id
+    return render(request, 'tweetFramework/handle_summary.html',{'posts':posts, 'user':user})
 
-    return render(request, 'tweetFramework/handle_summary.html',{'posts':posts,
-                                                                 'user':user})
 
 def home_page(request):
     return render(request, 'home.html')
@@ -98,7 +80,6 @@ def home_page(request):
 def list_artist(request):
     allartists = SpotifyArtistInfo.objects.all()
     if request.method == 'POST':
-        artist = request.POST["artist"]
         artist_choice = request.POST["artistChoicesContainer"]
         artist_metadata = get_spotify_artist_by_id(artist_choice)
         created_artist, created = SpotifyArtistInfo.objects.get_or_create(
