@@ -63,7 +63,8 @@ def get_spotify_artist_by_id(artist_id):
     url = SPOTIFY_BASE_URL + SPOTIFY_ARTISTS + artist_id
 
     response = requests.get(url, headers=spotify_authenticate())
-    return response.text
+    results = json.loads(response.text)
+    return results
 
 def get_spotify_artist(artist_name):
     '''
@@ -129,10 +130,9 @@ def search_spotify_artist(artist_name):
     return results
 
 
-def get_artist_albums(artist_name: str) -> list[Album]:
-    artist_id = search_spotify_artist_by_name(artist_name)
+def get_artist_albums(artist_id: int) -> list[Album]:
 
-    url = SPOTIFY_BASE_URL + SPOTIFY_ARTISTS + artist_id[3] + '/albums'
+    url = SPOTIFY_BASE_URL + SPOTIFY_ARTISTS + artist_id + '/albums'
 
     response = requests.get(url, headers=spotify_authenticate())
     albums_results = json.loads(response.text)

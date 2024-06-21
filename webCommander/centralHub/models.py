@@ -6,6 +6,7 @@ class TwitterUser(models.Model):
     twitter_name = models.CharField(max_length = 100)
     twitter_user_id = models.PositiveIntegerField(unique=True)
     twitter_handle_avatar = models.URLField(blank=True)
+    twitter_last_post_id = models.PositiveIntegerField(unique=True, null=True, blank=True)
 
     class Meta:
         ordering = ['-id']
@@ -27,11 +28,12 @@ class TwitterUserPosts(models.Model):
         unique_together = [('twitter_user','twitter_text')]
 
     def __str__(self):
-        return f'{self.twitter_user.twitter_handle} Posts'
+        return f'Post # {self.twitter_post_id} - {self.twitter_user}'
 
 class SpotifyArtistInfo(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     spotify_artist = models.CharField(max_length = 100, unique=True)
+    spotify_artist_id = models.CharField(max_length = 22, unique=True)
     spotify_image = models.URLField(blank=True)
     spotify_popularity = models.PositiveIntegerField(blank=True)
     spotify_artist_albums_registered = models.PositiveIntegerField(blank=True, editable=True, default=0)
