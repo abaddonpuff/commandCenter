@@ -23,6 +23,7 @@ X_GET_MYUSER = X_BASE_URL+'/2/users/me'
 X_GET_USER = X_BASE_URL+'/2/users/by/username/'
 X_TWEET_ID = X_BASE_URL+'/2/tweets/'
 X_GET_TWEET = X_BASE_URL+'/2/users/'
+X_USAGE = X_BASE_URL+'/2/usage/tweets'
 
 #CODES
 TOO_MANY_REQUESTS = 429
@@ -32,6 +33,8 @@ SUCCESS = 200
 class XUserDoesNotExist(Exception):
     pass
 
+class XAPIUsageExceeded(Exception):
+    pass
 
 def x_authenticate():
 
@@ -47,10 +50,8 @@ def request_to_x_api(endpoint, headers={}, params={}):
     response = x_session.get(endpoint, headers=headers, params=params)
 
     print(f'Request to API {response.status_code}')
-    while response.status_code == TOO_MANY_REQUESTS:
-        print('Too many requests, trying in 15 mins...')
-        sleep(900)
-        response = request_to_x_api(endpoint, headers={}, params=params)
+    if response.status_code == TOO_MANY_REQUESTS:
+        raise XAPIUsageExceeded(f"API Exceeded, try again in 15 Mins")
 
     return response
 
@@ -103,7 +104,6 @@ def get_tweets_since_last(x_user_id: int,last_id: int, max_results=30) -> list:
         'expansions':'attachments.media_keys,attachments.poll_ids',
         'since_id': last_id,
         'tweet.fields':'attachments'
-        #user.fields: most_recent_tweet_id
     }
     api_url = X_GET_TWEET + str(x_user_id) + '/tweets'
 
@@ -137,8 +137,7 @@ def get_single_tweet(tweet_id):
     return tweets['data']
 
 def main():
-    #Testing Abaddon
-    print(get_tweets_since_last(284461865,1803205013553996218))
+    print(get_api_usage())
 
 if __name__ == '__main__':
     main()
