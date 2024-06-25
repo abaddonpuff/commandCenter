@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('centralHub', '0002_twitteruser_twitter_name'),
+        ("centralHub", "0002_twitteruser_twitter_name"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='twitteruser',
-            name='twitter_name',
+            model_name="twitteruser",
+            name="twitter_name",
         ),
     ]

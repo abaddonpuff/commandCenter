@@ -2,22 +2,16 @@
 
 from django.db import migrations, models
 
-def populate_unique_emails(apps, schema_editor):
-    UserProfile = apps.get_model('centralHub', 'TwitterUser')
-    for profile in TwitterUser.objects.all():
-        profile.twitter_name = f"NoName"
-        profile.save()
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('centralHub', '0003_remove_twitteruser_twitter_name'),
+        ("centralHub", "0003_remove_twitteruser_twitter_name"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='twitteruser',
-            name='twitter_name',
-            field=models.CharField(default='NoneApplied', max_length=100),
+            model_name="twitteruser",
+            name="twitter_name",
+            field=models.CharField(default="NoneApplied", max_length=100),
         ),
     ]

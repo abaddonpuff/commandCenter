@@ -1,5 +1,9 @@
 from django import forms
-from centralHub.xTwitter.twitterAPI import x_userlookup, XUserDoesNotExist, XAPIUsageExceeded
+from centralHub.xTwitter.twitterAPI import (
+    x_userlookup,
+    XUserDoesNotExist,
+    XAPIUsageExceeded,
+)
 
 
 class SubmitXUser(forms.Form):
@@ -10,13 +14,15 @@ class SubmitXUser(forms.Form):
         try:
             x_api_response = x_userlookup(handle)
             return x_api_response
-        except XUserDoesNotExist as e:
+        except XUserDoesNotExist:
             raise forms.ValidationError("Unrecognized X handle")
-        except XAPIUsageExceeded as e:
+        except XAPIUsageExceeded:
             raise forms.ValidationError(f"API Usage exceeded to query handle {handle}")
 
+
 class SpotifySearchForm(forms.Form):
-    artist = forms.CharField(label='Search for an artist', max_length=100)
+    artist = forms.CharField(label="Search for an artist", max_length=100)
+
 
 class SpotifyChoicesForm(forms.Form):
-    artist_choices = forms.ChoiceField(label='Select your option', choices=[])
+    artist_choices = forms.ChoiceField(label="Select your option", choices=[])
