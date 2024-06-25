@@ -5,10 +5,33 @@ from django.db.utils import IntegrityError
 from centralHub.forms import SubmitXUser
 from centralHub.models import TwitterUser, TwitterUserPosts, SpotifyArtistInfo, SpotifyAlbumTracking
 from centralHub.spotify.spotifyAPI import search_spotify_artist, get_artist_albums, get_spotify_artist_by_id
-from centralHub.xTwitter.twitterAPI import get_top_tweets_from_user, get_tweets_since_last
+from centralHub.xTwitter.twitterAPI import get_top_tweets_from_user, get_tweets_since_last, XAPIUsageExceeded
+from centralHub.slackbot.slackbot_api import post_slack_message
 
 FIRST_LOAD=20
 
+### Homepage
+def home_page(request):
+    return render(request, 'home.html')
+
+### DB helpers
+def insert_posts_to_x_db(twitter_user, tweet_data):
+    created_count=0
+    for tweet in tweet_data['data']:
+        created_tweet, created = TwitterUserPosts.objects.get_or_create(
+                    twitter_user = twitter_user,
+                    #TODO create a function to obtain the post type if containing media
+                    twitter_post_type = 'text',
+                    twitter_post_id = tweet['id'],
+                    twitter_text = tweet['text'],
+                    twitter_post_to_link = f"https://x.com/{twitter_user.twitter_handle}/status/{tweet['id']}"
+                )
+        if created:
+            created_count += 1
+            twitter_user.twitter_last_post_id = tweet_data['meta']['newest_id']
+    return created_count
+
+### X/Twitter functions
 def submit_x_user(request):
     if request.method == 'POST':
         form_handle = SubmitXUser(request.POST)
@@ -32,24 +55,7 @@ def submit_x_user(request):
 def list_twitter(request):
     alltweets = TwitterUser.objects.all()
 
-
     return render(request, 'tweetFramework/showtweets.html',{'alltweets':alltweets})
-
-def insert_to_x_db(twitter_user, tweet_data):
-    created_count=0
-    for tweet in tweet_data['data']:
-        created_tweet, created = TwitterUserPosts.objects.get_or_create(
-                    twitter_user = twitter_user,
-                    #TODO create a function to obtain the post type if containing media
-                    twitter_post_type = 'text',
-                    twitter_post_id = tweet['id'],
-                    twitter_text = tweet['text'],
-                    twitter_post_to_link = f"https://x.com/{twitter_user.twitter_handle}/status/{tweet['id']}"
-                )
-        if created:
-            created_count += 1
-            twitter_user.twitter_last_post_id = tweet_data['meta']['newest_id']
-        return created_count
 
 def handle_summary(request, twitter_handle):
     user = TwitterUser.objects.get(twitter_handle=twitter_handle)
@@ -58,14 +64,21 @@ def handle_summary(request, twitter_handle):
     created_count = 0
 
     if posts.count() == 0:
-        last_tweets = get_top_tweets_from_user(user.twitter_handle, max_results=FIRST_LOAD)
-        created_count = insert_to_x_db(user, last_tweets)
-        #TODO If posts are populated, search for the latest tweet
+        try:
+            last_tweets = get_top_tweets_from_user(user.twitter_handle, max_results=FIRST_LOAD)
+            created_count = insert_posts_to_x_db(user, last_tweets)
+        except XAPIUsageExceeded:
+            messages.info(request, 'API Exceeded, try again in 15 Mins')
+            print(f"API Usage exceeded to query user {twitter_user.twitter_name}: Could not check")
     else:
-        new_posts = get_tweets_since_last(user.twitter_user_id,user.twitter_last_post_id)
-        if 'data' in new_posts.keys():
-            #New items introduced
-            created_count= insert_to_x_db(user, new_posts)
+        try:
+            new_posts = get_tweets_since_last(user.twitter_user_id,user.twitter_last_post_id)
+            if 'data' in new_posts.keys():
+                created_count= insert_posts_to_x_db(user, new_posts)
+                post_slack_message(f"User {user.twitter_name} posted {created_count} new messages!")
+        except XAPIUsageExceeded:
+            messages.info(request, 'API Exceeded, try again in 15 Mins')
+            print(f"API Usage exceeded to query user {twitter_user.twitter_name}: Could not check")
 
     if created_count > 0:
         messages.success(request, f'{created_count} Posts created')
@@ -74,9 +87,7 @@ def handle_summary(request, twitter_handle):
     return render(request, 'tweetFramework/handle_summary.html',{'posts':posts, 'user':user})
 
 
-def home_page(request):
-    return render(request, 'home.html')
-
+###Spotify Functions
 def list_artist(request):
     allartists = SpotifyArtistInfo.objects.all()
     if request.method == 'POST':
@@ -122,8 +133,6 @@ def artist_details(request, spotify_artist):
     spotify_artist_albums = get_artist_albums(artist.spotify_artist_id)
     count = 0
     for artist_album in spotify_artist_albums:
-        # assuming api response will be the same,
-        # this will not re-insert the same album
         try:
             album, created = SpotifyAlbumTracking.objects.get_or_create(
                 spotify_user=artist,
@@ -143,6 +152,7 @@ def artist_details(request, spotify_artist):
             print(f"x) Album {album.spotify_albums} already in database")
 
     if count > 0:
+        post_slack_message(f'{count} albums for artist {artist} added successfully')
         messages.success(request, f'{count} artist albums added successfully')
     else:
         messages.info(request, 'All albums already in database')
