@@ -1,2 +1,2 @@
-release: python webCommander/manage.py migrate
-web: gunicorn webCommander.webCommander.wsgi --log-file -
+release: python manage.py migrate
+web: gunicorn webCommander.wsgi --log-file -
