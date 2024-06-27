@@ -7,14 +7,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 SLACK_APP_TOKEN = os.getenv('SLACKBOT_OAUTH')
+SLACk_WEBHOOK = os.getenv('SLACK_C2NOTIFIER')
 
 def post_slack_message(text: str) -> bool:
-    url = 'https://hooks.slack.com/services/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'
     headers = {'Content-Type': 'application/json'}
     data = {
         "text": text
     }
-    response = requests.post(url, headers=headers, data=json.dumps(data))
+    response = requests.post(SLACk_WEBHOOK, headers=headers, data=json.dumps(data))
     if response.status_code == 200:
         return True
     else:
