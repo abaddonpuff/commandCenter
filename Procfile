@@ -1,2 +1,2 @@
-release: python manage.py migrate
-web: gunicorn centralHub.wsgi --log-file -
+release: python webCommander/manage.py migrate
+web: gunicorn webCommander.webCommander.wsgi --log-file -
