@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load bootstrap5 %}
+
+{% block title %}{{ artist.spotify_artist }}{% endblock %}
+
+{% block content %}
+    <h1>{{ artist.spotify_user.spotify_artist }}</h1>
+    <table class="table">
+      <thead>
+          <tr>
+            <th>Album Name</th>
+            <th># of Tracks</th>
+            <th>Album Cover</th>
+          </tr>
+      </thead>
+      <tbody>
+      {% for album in albums %}
+        <tr>
+            <td>{{ album.spotify_albums }}</td>
+            <td>{{ album.number_of_tracks }}</td>
+            <td><img src="{{ album.spotify_image_url }}" alt="Album Cover for {{ album.spotify_albums }} }}" style="width:100px;height:100px;"></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+  </table>
+{% endblock %}

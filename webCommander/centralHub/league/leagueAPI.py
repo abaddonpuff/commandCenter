@@ -27,12 +27,10 @@ def get_league_summoner(summoner, tag_id):
         'Accept-Charset':"application/x-www-form-urlencoded; charset=UTF-8",
         'X-Riot-Token':LEAGUE_API_KEY
     }
-    # params = {
-    #     'api_key':LEAGUE_API_KEY
-    # }
+
     results = json.loads(requests.get(url, headers=headers).text)
 
-    return results['puuid']
+    return results
 
 def get_league_games_by_summoner_name(summoner, tag_id, start_time=0, endtime=0, count=20):
     '''
@@ -40,7 +38,7 @@ def get_league_games_by_summoner_name(summoner, tag_id, start_time=0, endtime=0,
     and amount of results.
     '''
     puuid = get_league_summoner(summoner, tag_id)
-    url = LEAGUE_BASE + LEAGUE_GAMES_BY_SUMMONER + puuid + '/ids'
+    url = LEAGUE_BASE + LEAGUE_GAMES_BY_SUMMONER + puuid['puuid'] + '/ids'
 
     headers={
         'Accept-Language':"en-US,en;q=0.9,es;q=0.8",

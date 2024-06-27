@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load bootstrap5 %}
+{% block content %}
+    <h1>Available Artists</h1>
+
+    <h2>Submit Artist</h2>
+
+    <form method="post" action="{% url 'show_all_artists' %}">
+        {% csrf_token %}
+        <input name="artist" type="text" placeholder="Enter Artist Name" hx-get="{% url 'get_artists' %}" hx-trigger="keyup changed delay:500ms" hx-target="#artistChoicesContainer">
+        <select id="artistChoicesContainer" name="artistChoicesContainer"></select>
+        <button type="submit">Search Artist</button>
+    </form>
+
+    <table class="table">
+    <thead>
+        <tr>
+          <th>Artist</th>
+          <th>Image</th>
+          <th>Popularity</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for artist in allartists %}
+    <tr>
+        <td><a href="{% url 'artist_summary' artist.spotify_artist %}">
+        {{ artist.spotify_artist}}
+        </a></td>
+        <br>
+        <td><img src="{{ artist.spotify_image}}" width="100" height="100" alt="Avatar"></td>
+        <td>{{ artist.spotify_popularity }}</td>
+    </tr>
+    {% endfor %}
+</tbody>
+{% endblock %}
