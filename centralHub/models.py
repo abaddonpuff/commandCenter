@@ -4,9 +4,9 @@ class TwitterUser(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     twitter_handle = models.CharField(max_length = 20, unique=True)
     twitter_name = models.CharField(max_length = 100)
-    twitter_user_id = models.PositiveIntegerField(unique=True)
+    twitter_user_id = models.PositiveBigIntegerField(unique=True)
     twitter_handle_avatar = models.URLField(blank=True)
-    twitter_last_post_id = models.PositiveIntegerField(unique=True, null=True, blank=True)
+    twitter_last_post_id = models.PositiveBigIntegerField(unique=True, null=True, blank=True)
 
     class Meta:
         ordering = ['-id']
@@ -20,7 +20,7 @@ class TwitterUserPosts(models.Model):
         related_name='user_posts',
         on_delete=models.CASCADE)
     twitter_post_type = models.CharField(max_length = 20)
-    twitter_post_id = models.PositiveIntegerField(unique=True)
+    twitter_post_id = models.PositiveBigIntegerField(unique=True)
     twitter_text = models.TextField(max_length = 20)
     twitter_post_to_link = models.URLField(blank=True)
 

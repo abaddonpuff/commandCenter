@@ -2,7 +2,6 @@ from django.http import HttpResponse
 from django.shortcuts import render,get_object_or_404
 from django.contrib import messages
 from django.db.utils import IntegrityError
-from django.contrib.auth import authenticate, login
 from centralHub.forms import SubmitXUser
 from centralHub.models import TwitterUser, TwitterUserPosts, SpotifyArtistInfo, SpotifyAlbumTracking
 from centralHub.spotify.spotifyAPI import search_spotify_artist, get_artist_albums, get_spotify_artist_by_id
@@ -37,7 +36,6 @@ def insert_posts_to_x_db(twitter_user, tweet_data):
 def submit_x_user(request):
     if request.method == 'POST':
         form_handle = SubmitXUser(request.POST)
-        breakpoint()
         if form_handle.is_valid():
             x_api_response = form_handle.cleaned_data['handle']
             entered_handle, created = TwitterUser.objects.get_or_create(
@@ -72,7 +70,7 @@ def handle_summary(request, twitter_handle):
             created_count = insert_posts_to_x_db(user, last_tweets)
         except XAPIUsageExceeded:
             messages.info(request, 'API Exceeded, try again in 15 Mins')
-            print(f"API Usage exceeded to query user {twitter_user.twitter_name}: Could not check")
+            print(f"API Usage exceeded to query user {user.twitter_name}: Could not check")
     else:
         try:
             new_posts = get_tweets_since_last(user.twitter_user_id,user.twitter_last_post_id)
@@ -81,7 +79,7 @@ def handle_summary(request, twitter_handle):
                 post_slack_message(f"User {user.twitter_name} posted {created_count} new messages!")
         except XAPIUsageExceeded:
             messages.info(request, 'API Exceeded, try again in 15 Mins')
-            print(f"API Usage exceeded to query user {twitter_user.twitter_name}: Could not check")
+            print(f"API Usage exceeded to query user {user.twitter_name}: Could not check")
 
     if created_count > 0:
         messages.success(request, f'{created_count} Posts created')
