@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.forms import AuthenticationForm
 from centralHub.xTwitter.twitterAPI import x_userlookup, XUserDoesNotExist, XAPIUsageExceeded
 
 
@@ -20,3 +21,9 @@ class SpotifySearchForm(forms.Form):
 
 class SpotifyChoicesForm(forms.Form):
     artist_choices = forms.ChoiceField(label='Select your option', choices=[])
+
+class CustomLoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super(CustomLoginForm, self).__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs['class'] = 'form-control'
+        self.fields['password'].widget.attrs['class'] = 'form-control'
