@@ -22,8 +22,8 @@ class SpotifySearchForm(forms.Form):
 class SpotifyChoicesForm(forms.Form):
     artist_choices = forms.ChoiceField(label='Select your option', choices=[])
 
-class CustomLoginForm(AuthenticationForm):
+class LoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
-        super(CustomLoginForm, self).__init__(*args, **kwargs)
+        super(LoginForm, self).__init__(*args, **kwargs)
         self.fields['username'].widget.attrs['class'] = 'form-control'
         self.fields['password'].widget.attrs['class'] = 'form-control'
