@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render,get_object_or_404
 from django.contrib import messages
 from django.db.utils import IntegrityError
+from django.contrib.auth import authenticate, login
 from centralHub.forms import SubmitXUser
 from centralHub.models import TwitterUser, TwitterUserPosts, SpotifyArtistInfo, SpotifyAlbumTracking
 from centralHub.spotify.spotifyAPI import search_spotify_artist, get_artist_albums, get_spotify_artist_by_id
@@ -12,6 +13,7 @@ FIRST_LOAD=20
 
 ### Homepage
 def home_page(request):
+
     return render(request, 'home.html')
 
 ### DB helpers
@@ -35,6 +37,7 @@ def insert_posts_to_x_db(twitter_user, tweet_data):
 def submit_x_user(request):
     if request.method == 'POST':
         form_handle = SubmitXUser(request.POST)
+        breakpoint()
         if form_handle.is_valid():
             x_api_response = form_handle.cleaned_data['handle']
             entered_handle, created = TwitterUser.objects.get_or_create(
