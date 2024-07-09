@@ -5,36 +5,50 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('centralHub', '0006_spotifyartistinfo'),
+        ("centralHub", "0006_spotifyartistinfo"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='spotifyartistinfo',
-            name='spotify_albums',
+            model_name="spotifyartistinfo",
+            name="spotify_albums",
         ),
         migrations.RemoveField(
-            model_name='spotifyartistinfo',
-            name='spotify_image_url',
+            model_name="spotifyartistinfo",
+            name="spotify_image_url",
         ),
         migrations.RemoveField(
-            model_name='spotifyartistinfo',
-            name='spotify_tracks',
+            model_name="spotifyartistinfo",
+            name="spotify_tracks",
         ),
         migrations.CreateModel(
-            name='SpotifyAlbumTracking',
+            name="SpotifyAlbumTracking",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_added', models.DateTimeField(auto_now_add=True)),
-                ('spotify_albums', models.CharField(max_length=100)),
-                ('spotify_tracks', models.PositiveIntegerField(blank=True)),
-                ('spotify_image_url', models.URLField(blank=True)),
-                ('spotify_user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='artist_album', to='centralHub.spotifyartistinfo')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date_added", models.DateTimeField(auto_now_add=True)),
+                ("spotify_albums", models.CharField(max_length=100)),
+                ("spotify_tracks", models.PositiveIntegerField(blank=True)),
+                ("spotify_image_url", models.URLField(blank=True)),
+                (
+                    "spotify_user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="artist_album",
+                        to="centralHub.spotifyartistinfo",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('spotify_user', 'spotify_albums')},
+                "unique_together": {("spotify_user", "spotify_albums")},
             },
         ),
     ]

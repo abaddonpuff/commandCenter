@@ -5,39 +5,60 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='TwitterUser',
+            name="TwitterUser",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_added', models.DateTimeField(auto_now_add=True)),
-                ('twitter_handle', models.CharField(max_length=20, unique=True)),
-                ('twitter_user_id', models.PositiveIntegerField(unique=True)),
-                ('twitter_handle_avatar', models.URLField(blank=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date_added", models.DateTimeField(auto_now_add=True)),
+                ("twitter_handle", models.CharField(max_length=20, unique=True)),
+                ("twitter_user_id", models.PositiveIntegerField(unique=True)),
+                ("twitter_handle_avatar", models.URLField(blank=True)),
             ],
             options={
-                'ordering': ['-id'],
+                "ordering": ["-id"],
             },
         ),
         migrations.CreateModel(
-            name='TwitterUserPosts',
+            name="TwitterUserPosts",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_added', models.DateTimeField(auto_now_add=True)),
-                ('twitter_post_type', models.CharField(max_length=20)),
-                ('twitter_post_id', models.PositiveIntegerField(unique=True)),
-                ('twitter_text', models.TextField(max_length=20)),
-                ('twitter_post_to_link', models.URLField(blank=True)),
-                ('twitter_user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='user_posts', to='centralHub.twitteruser')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date_added", models.DateTimeField(auto_now_add=True)),
+                ("twitter_post_type", models.CharField(max_length=20)),
+                ("twitter_post_id", models.PositiveIntegerField(unique=True)),
+                ("twitter_text", models.TextField(max_length=20)),
+                ("twitter_post_to_link", models.URLField(blank=True)),
+                (
+                    "twitter_user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="user_posts",
+                        to="centralHub.twitteruser",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('twitter_user', 'twitter_text')},
+                "unique_together": {("twitter_user", "twitter_text")},
             },
         ),
     ]

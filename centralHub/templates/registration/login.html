@@ -1,0 +1,9 @@
+{% load bootstrap5 %}
+
+<title>{% block title %}Login{% endblock %}</title>
+<h2>Log In</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form }}
+  <button type="submit">Log In</button>
+</form>

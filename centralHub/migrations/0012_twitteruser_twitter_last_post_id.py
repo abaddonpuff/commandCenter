@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('centralHub', '0011_alter_spotifyalbumtracking_spotify_albums'),
+        ("centralHub", "0011_alter_spotifyalbumtracking_spotify_albums"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='twitteruser',
-            name='twitter_last_post_id',
+            model_name="twitteruser",
+            name="twitter_last_post_id",
             field=models.PositiveIntegerField(default=0),
         ),
     ]

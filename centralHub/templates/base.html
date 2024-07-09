@@ -7,6 +7,7 @@
     {% bootstrap_javascript %}
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 </head>
+{% if user.is_authenticated %}
 <body class="d-flex flex-column min-vh-100">
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
@@ -20,6 +21,10 @@
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Platforms
             </a>
+            <form action="{% url 'logout' %}" method="post">
+              {% csrf_token %}
+              <button type="submit">Log Out</button>
+            </form>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
               <li><a class="dropdown-item" href="{% url 'showalltweets' %}">X</a></li>
               <li><a class="dropdown-item" href="{% url 'show_all_artists' %}">Spotify</a></li>
@@ -37,5 +42,9 @@
         {% block content%}
         {% endblock %}
     </div>
+{% else %}
+<p>You are not logged in</p>
+<a href="{% url 'login' %}">Log In</a>
+{% endif %}
 </body>
 </html>

@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('centralHub', '0015_alter_spotifyartistinfo_spotify_artist_id'),
+        ("centralHub", "0015_alter_spotifyartistinfo_spotify_artist_id"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='spotifyartistinfo',
-            name='spotify_artist_id',
+            model_name="spotifyartistinfo",
+            name="spotify_artist_id",
             field=models.CharField(max_length=22, unique=True),
         ),
     ]

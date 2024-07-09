@@ -1,13 +1,12 @@
 {% extends "base.html" %}
-
-{% block title %}{{ user.twitter_handle }}{% endblock %}
-
-<a href="{% url 'submit_handle'%}">
-    Submit a new user
- </a>
-
+{% load bootstrap5 %}
+{% block title %} {{ user.twitter_handle }} {% endblock %}
 {% block content %}
+
     <h1>{{ user.twitter_handle }} <img src="{{ user.twitter_handle_avatar}}" alt="Avatar"></h1>
+    <a href="{% url 'submit_handle'%}">
+        Submit a new user
+    </a>
 
     <table class="table">
       <thead>
@@ -26,6 +25,5 @@
         </tr>
       {% endfor %}
       </tbody>
-  </table>
 
 {% endblock %}
