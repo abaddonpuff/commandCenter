@@ -1,14 +1,13 @@
-<!-- success.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Success</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% load bootstrap5 %}
+
+{% block title %}Submission Success{% endblock %}
+
+{% block content %}
     <h1>Form Submitted Successfully</h1>
     <p>{{ entered_handle }} Was submitted to the DB</p>
     <a href="{% url 'showalltweets'%}">
         Return to home
     </a>
-</body>
-</html>
+
+{% endblock %}

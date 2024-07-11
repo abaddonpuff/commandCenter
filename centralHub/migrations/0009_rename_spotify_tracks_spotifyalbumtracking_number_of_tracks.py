@@ -4,15 +4,14 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('centralHub', '0008_spotifyartistinfo_spotify_image_and_more'),
+        ("centralHub", "0008_spotifyartistinfo_spotify_image_and_more"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='spotifyalbumtracking',
-            old_name='spotify_tracks',
-            new_name='number_of_tracks',
+            model_name="spotifyalbumtracking",
+            old_name="spotify_tracks",
+            new_name="number_of_tracks",
         ),
     ]

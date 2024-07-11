@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('centralHub', '0004_twitteruser_twitter_name'),
+        ("centralHub", "0004_twitteruser_twitter_name"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='twitteruser',
-            name='twitter_name',
+            model_name="twitteruser",
+            name="twitter_name",
             field=models.CharField(max_length=100),
         ),
     ]
