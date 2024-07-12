@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
 from django.db.utils import IntegrityError
+from django.contrib.auth.decorators import login_required
 from centralHub.forms import SubmitXUser
 from centralHub.models import (
     TwitterUser,
@@ -21,6 +22,7 @@ from centralHub.xTwitter.twitterAPI import (
 )
 from centralHub.slackbot.slackbot_api import post_slack_message
 
+
 FIRST_LOAD = 20
 
 
@@ -30,6 +32,7 @@ def home_page(request):
 
 
 ### DB helpers
+@login_required
 def insert_posts_to_x_db(twitter_user, tweet_data):
     created_count = 0
     for tweet in tweet_data["data"]:
@@ -48,6 +51,7 @@ def insert_posts_to_x_db(twitter_user, tweet_data):
 
 
 ### X/Twitter functions
+@login_required
 def submit_x_user(request):
     if request.method == "POST":
         form_handle = SubmitXUser(request.POST)
@@ -78,13 +82,13 @@ def submit_x_user(request):
         {"form_handle": form_handle},
     )
 
-
+@login_required
 def list_twitter(request):
     alltweets = TwitterUser.objects.all()
 
     return render(request, "tweetFramework/showtweets.html", {"alltweets": alltweets})
 
-
+@login_required
 def handle_summary(request, twitter_handle):
     user = TwitterUser.objects.get(twitter_handle=twitter_handle)
 
@@ -108,7 +112,7 @@ def handle_summary(request, twitter_handle):
                 user.twitter_user_id, user.twitter_last_post_id
             )
             if "data" in new_posts.keys():
-                created_count = insert_posts_to_x_db(user, new_posts)
+                created_count = insert_posts_to_x_dbx_db(user, new_posts)
                 post_slack_message(
                     f"User {user.twitter_name} posted {created_count} new messages!"
                 )
@@ -128,6 +132,7 @@ def handle_summary(request, twitter_handle):
 
 
 ###Spotify Functions
+@login_required
 def list_artist(request):
     allartists = SpotifyArtistInfo.objects.all()
     if request.method == "POST":
@@ -155,7 +160,7 @@ def list_artist(request):
         request, "spotifyFramework/spotify_summary.html", {"allartists": allartists}
     )
 
-
+@login_required
 def get_artists(request):
     """
     Used to populate artistChoicesContainer
@@ -171,7 +176,7 @@ def get_artists(request):
     )
     return HttpResponse(options)
 
-
+@login_required
 def artist_details(request, spotify_artist):
     """
     Gets the tracks from an artist
