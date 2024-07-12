@@ -32,7 +32,6 @@ def home_page(request):
 
 
 ### DB helpers
-@login_required
 def insert_posts_to_x_db(twitter_user, tweet_data):
     created_count = 0
     for tweet in tweet_data["data"]:
@@ -90,36 +89,36 @@ def list_twitter(request):
 
 @login_required
 def handle_summary(request, twitter_handle):
-    user = TwitterUser.objects.get(twitter_handle=twitter_handle)
+    twitter_user = TwitterUser.objects.get(twitter_handle=twitter_handle)
 
-    posts = user.user_posts.all()
+    posts = twitter_user.user_posts.all()
     created_count = 0
 
     if posts.count() == 0:
         try:
             last_tweets = get_top_tweets_from_user(
-                user.twitter_handle, max_results=FIRST_LOAD
+                twitter_user.twitter_handle, max_results=FIRST_LOAD
             )
-            created_count = insert_posts_to_x_db(user, last_tweets)
+            created_count = insert_posts_to_x_db(twitter_user, last_tweets)
         except XAPIUsageExceeded:
             messages.info(request, "API Exceeded, try again in 15 Mins")
             print(
-                f"API Usage exceeded to query user {user.twitter_name}: Could not check"
+                f"API Usage exceeded to query user {twitter_user.twitter_name}: Could not check"
             )
     else:
         try:
             new_posts = get_tweets_since_last(
-                user.twitter_user_id, user.twitter_last_post_id
+                twitter_user.twitter_user_id, twitter_user.twitter_last_post_id
             )
             if "data" in new_posts.keys():
-                created_count = insert_posts_to_x_dbx_db(user, new_posts)
+                created_count = insert_posts_to_x_db(twitter_user, new_posts)
                 post_slack_message(
-                    f"User {user.twitter_name} posted {created_count} new messages!"
+                    f"User {twitter_user.twitter_name} posted {created_count} new messages!"
                 )
         except XAPIUsageExceeded:
             messages.info(request, "API Exceeded, try again in 15 Mins")
             print(
-                f"API Usage exceeded to query user {user.twitter_name}: Could not check"
+                f"API Usage exceeded to query user {twitter_user.twitter_name}: Could not check"
             )
 
     if created_count > 0:
@@ -127,7 +126,7 @@ def handle_summary(request, twitter_handle):
 
     # TODO IF latest Tweet is not the first item, then retrieve all items before latest id
     return render(
-        request, "tweetFramework/handle_summary.html", {"posts": posts, "user": user}
+        request, "tweetFramework/handle_summary.html", {"posts": posts}
     )
 
 
