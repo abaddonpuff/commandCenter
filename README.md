@@ -23,12 +23,32 @@ Before you begin, ensure you have met the following requirements:
 1. Clone the repo:
    ```sh
    git clone https://github.com/abaddonpuff/commandCenter.git
-   cd commandCenter```
+   cd commandCenter
+
+3. Install requirements from the requirements file
+   ```sh
+   pip install -r requirements.txt
+
+3. Install PostgreSQL
 
 2. Create a .env file and add your configuration details:
-    ```SLACK_WEBHOOK_URL=your-slack-webhook-url
-    SPOTIFY_API_KEY=your-spotify-api-key
-    LINKEDIN_API_KEY=your-linkedin-api-key```
+    ```sh
+      X_API_KEY=YOUR_X_API_KEY
+      X_API_SECRET=YOUR_X_API_SECRET
+      X_BEARER_TOKEN=X_BEARER_TOKEN
+      X_ACCESS_TOKEN=YOUR_X_ACCESS_TOKEN
+      X_ACCESS_TOKEN_SECRET=YOUR_X_TOKEN_SECRET
+      CLIENT_ID=YOUR_X_CLIENT_ID
+      CLIENT_SECRET=YOUR_X_CLIENT_SECRET
+      SPOTIFY_CLIENTID=YOUR_SPOTIFY_CLIENT_ID
+      SPOTIFY_CLIENT_SECRET=YOUR_SPOTIFY_CLIENT_SECRET
+      LEAGUE_API_KEY=YOUR_LEAGUE_OF_LEGENDS_API_KEY
+      SLACKBOT_OAUTH=YOUR_SLACKBOT_OAUTH_KEY
+      SLACK_C2NOTIFIER=YOUR_SLACK_CHANNEL_WEBHOOK
+      SECRET_KEY=A_DJANGO_SECRET_KEY
+      ALLOWED_HOSTS=.localhost,.herokuapp.com
+      DEBUG=True
+      DATABASE_URL=postgres://postgres:password@0.0.0.0:5432/commandcenter
 
 
 ### Deployment
